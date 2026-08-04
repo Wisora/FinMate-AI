@@ -1,0 +1,29 @@
+version: 2
+updates:
+  # NPM packages
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"   # batch updates once a week
+      day: "sunday"
+      time: "06:00"
+    commit-message:
+      prefix: "chore(deps)"
+    labels:
+      - "dependencies"
+      - "security"
+    reviewers:
+      - "your-org/dev-team"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "06:00"
+    commit-message:
+      prefix: "chore(actions)"
+    labels:
+      - "ci"
+      - "automation"

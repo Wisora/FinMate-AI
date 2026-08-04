@@ -1,0 +1,59 @@
+name: Maintenance Agent
+
+on:
+  schedule:
+    - cron: '0 3 * * 1'   # every Monday at 03:00 UTC
+  workflow_dispatch:       # allow manual trigger
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Lint check
+      - name: Run lint
+        run: npm run lint --if-present
+
+      # Run tests
+      - name: Run tests
+        run: npm test --if-present
+
+      # Security audit
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate || true
+
+      # Dependency updates (Dependabot alternative)
+      - name: Check outdated packages
+        run: npm outdated || true
+
+      # Lighthouse performance audit
+      - name: Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          urls: 'http://localhost:3000'
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+      # Create GitHub issue if problems found
+      - name: Create issue on failure
+        if: failure()
+        uses: peter-evans/create-issue-from-file@v4
+        with:
+          title: "Maintenance Agent Report"
+          content-filepath: ./lighthouseci-results.md
+          labels: maintenance, bug

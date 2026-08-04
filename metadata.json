@@ -1,0 +1,6 @@
+{
+  "name": "FinMate AI",
+  "description": "Multilingual, accessible personal finance assistant with AI-driven budgeting, savings, debt tracking, investments, and interactive reports.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

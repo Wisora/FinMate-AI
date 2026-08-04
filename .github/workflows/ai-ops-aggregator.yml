@@ -1,0 +1,77 @@
+name: AI Ops Aggregator ](https://github.com/your-org/ops-repo/actions/workflows/ai-ops-aggregator.yml/badge.svg)
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # every Monday at 06:00 UTC
+  workflow_dispatch: # allow manual trigger
+
+jobs:
+  aggregate-reports:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout central Ops repo
+      - name: Checkout Ops repo
+        uses: actions/checkout@v4
+
+      # Pull FinMate AI reports
+      - name: Fetch FinMate AI reports
+        uses: actions/checkout@v4
+        with:
+          repository: your-org/finmate-ai
+          path: finmate-ai
+
+      # Pull Budget Builder Lite reports
+      - name: Fetch Budget Builder Lite reports
+        uses: actions/checkout@v4
+        with:
+          repository: your-org/budget-builder-lite
+          path: budget-builder-lite
+
+      # Aggregate results
+      - name: Aggregate AI Ops reports
+        run: |
+          echo "# AI Ops Suite Aggregated Report" > aggregated-report.md
+          echo "Generated: $(date)" >> aggregated-report.md
+          echo "" >> aggregated-report.md
+          echo "## FinMate AI" >> aggregated-report.md
+          cat finmate-ai/lighthouseci-results.md >> aggregated-report.md || echo "No report found"
+          echo "" >> aggregated-report.md
+          echo "## Budget Builder Lite" >> aggregated-report.md
+          cat budget-builder-lite/lighthouseci-results.md >> aggregated-report.md || echo "No report found"
+
+      # Commit aggregated report to Ops repo
+      - name: Commit aggregated report
+        run: |
+          git config --global user.name 'AI Ops Bot'
+          git config --global user.email 'aiops-bot@users.noreply.github.com'
+          git add aggregated-report.md
+          git commit -m "AI Ops aggregated report"
+          git push
+
+      # 🔔 Slack Notification
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+              "text": "*AI Ops Suite Report*",
+              "attachments": [
+                {
+                  "title": "FinMate AI & Budget Builder Lite",
+                  "text": "Aggregated report generated and committed to Ops repo.",
+                  "color": "#36a64f"
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      # 🔔 Microsoft Teams Notification (send directly via curl to avoid unavailable action)
+      - name: Notify Teams
+        if: env.TEAMS_WEBHOOK_URL != ''
+        env:
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+        run: |
+          payload=$(jq -n --arg text "AI Ops Suite report for FinMate AI & Budget Builder Lite has been generated and committed." '{text: $text}')
+          curl -s -H "Content-Type: application/json" -d "$payload" "$TEAMS_WEBHOOK_URL"
