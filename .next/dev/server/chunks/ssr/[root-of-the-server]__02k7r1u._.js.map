@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 22, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Craig%20A/Desktop/finmate-ai/src/pages/index.tsx"],"sourcesContent":["import { useEffect, useState } from \"react\";\r\n\r\nexport default function Home() {\r\n  // Track whether the component has mounted on the client\r\n  const [mounted, setMounted] = useState(false);\r\n\r\n  useEffect(() => {\r\n    setMounted(true);\r\n  }, []);\r\n\r\n  return (\r\n    <main style={{ padding: \"2rem\", fontFamily: \"sans-serif\" }}>\r\n      <h1>Welcome to FinMate AI</h1>\r\n\r\n      {/* Only render client‑specific content after mount */}\r\n      {mounted ? (\r\n        <p>You are now seeing client‑side hydrated content.</p>\r\n      ) : (\r\n        <p>Loading…</p>\r\n      )}\r\n    </main>\r\n  );\r\n}\r\n"],"names":["Home","mounted","setMounted","style","padding","fontFamily"],"mappings":";;;;;AAAA;;;AAEe,SAASA;IACtB,wDAAwD;IACxD,MAAM,CAACC,SAASC,WAAW,GAAG,IAAA,+GAAQ,EAAC;IAEvC,IAAA,gHAAS,EAAC;QACRA,WAAW;IACb,GAAG,EAAE;IAEL,qBACE,qKAAC;QAAKC,OAAO;YAAEC,SAAS;YAAQC,YAAY;QAAa;;0BACvD,qKAAC;0BAAG;;;;;;YAGHJ,wBACC,qKAAC;0BAAE;;;;;qCAEH,qKAAC;0BAAE;;;;;;;;;;;;AAIX"}}]
+}
