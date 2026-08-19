@@ -2,7 +2,7 @@ name: Weekly Investor Reports (Executive Summary)
 
 on:
   schedule:
-    - cron: "0 10 * * 1"   # every Monday at 10:00 UTC
+    - cron: "0 10 * * 1" # every Monday at 10:00 UTC
   workflow_dispatch:
 
 jobs:

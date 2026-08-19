@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
-import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
+import React, { useEffect } from "react";
+import { CheckCircle2, AlertCircle, Info, X } from "lucide-react";
 
 export interface ToastMessage {
   id: string;
-  type: 'success' | 'warning' | 'error' | 'info';
+  type: "success" | "warning" | "error" | "info";
   message: string;
 }
 
@@ -26,7 +26,10 @@ export const ToastContainer: React.FC<ToastProps> = ({ toasts, onDismiss }) => {
   );
 };
 
-const ToastItem: React.FC<{ toast: ToastMessage; onDismiss: (id: string) => void }> = ({ toast, onDismiss }) => {
+const ToastItem: React.FC<{
+  toast: ToastMessage;
+  onDismiss: (id: string) => void;
+}> = ({ toast, onDismiss }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       onDismiss(toast.id);
@@ -42,10 +45,13 @@ const ToastItem: React.FC<{ toast: ToastMessage; onDismiss: (id: string) => void
   };
 
   const borders = {
-    success: 'border-emerald-200 dark:border-emerald-900 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100',
-    warning: 'border-amber-200 dark:border-amber-900 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100',
-    error: 'border-rose-200 dark:border-rose-900 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100',
-    info: 'border-sky-200 dark:border-sky-900 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100',
+    success:
+      "border-emerald-200 dark:border-emerald-900 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100",
+    warning:
+      "border-amber-200 dark:border-amber-900 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100",
+    error:
+      "border-rose-200 dark:border-rose-900 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100",
+    info: "border-sky-200 dark:border-sky-900 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100",
   };
 
   return (

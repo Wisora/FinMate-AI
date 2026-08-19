@@ -7,15 +7,15 @@ let goals = [
     title: "Emergency Fund",
     target: 5000,
     progress: 1500,
-    deadline: "2026-12-31"
+    deadline: "2026-12-31",
   },
   {
     id: 2,
     title: "Vacation Savings",
     target: 3000,
     progress: 1200,
-    deadline: "2026-10-15"
-  }
+    deadline: "2026-10-15",
+  },
 ];
 
 // Fetch all goals
@@ -32,7 +32,7 @@ export async function addGoal(title, target, deadline) {
         title,
         target,
         progress: 0,
-        deadline
+        deadline,
       };
       goals.push(newGoal);
       resolve(newGoal);
@@ -44,7 +44,7 @@ export async function addGoal(title, target, deadline) {
 export async function updateGoal(goalId, amount) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      const goal = goals.find(g => g.id === goalId);
+      const goal = goals.find((g) => g.id === goalId);
       if (!goal) {
         reject(new Error("Goal not found"));
         return;
@@ -59,7 +59,7 @@ export async function updateGoal(goalId, amount) {
 export async function deleteGoal(goalId) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      const index = goals.findIndex(g => g.id === goalId);
+      const index = goals.findIndex((g) => g.id === goalId);
       if (index === -1) {
         reject(new Error("Goal not found"));
         return;

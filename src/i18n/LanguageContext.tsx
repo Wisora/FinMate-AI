@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { CurrencyCode, LanguageCode, SettingsState } from '../types';
-import { translations, currencies } from './translations';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { CurrencyCode, LanguageCode, SettingsState } from "../types";
+import { translations, currencies } from "./translations";
 
 interface LanguageContextType {
   language: LanguageCode;
@@ -9,7 +9,7 @@ interface LanguageContextType {
   setCurrency: (curr: CurrencyCode) => void;
   formatCurrency: (amountInUSD: number) => string;
   t: (key: string) => string;
-  dir: 'ltr' | 'rtl';
+  dir: "ltr" | "rtl";
   darkMode: boolean;
   setDarkMode: (val: boolean) => void;
   settings: SettingsState;
@@ -21,20 +21,24 @@ const DEFAULT_SETTINGS: SettingsState = {
   alertOverspending: true,
   alertGoalMilestones: true,
   weeklyInsights: true,
-  currency: 'USD',
-  language: 'en',
+  currency: "USD",
+  language: "en",
   darkMode: false,
 };
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const LanguageContext = createContext<LanguageContextType | undefined>(
+  undefined,
+);
 
-export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [settings, setSettings] = useState<SettingsState>(() => {
     try {
-      const saved = localStorage.getItem('finmate_settings');
+      const saved = localStorage.getItem("finmate_settings");
       if (saved) return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
     } catch (e) {
-      console.warn('Failed to load settings from localStorage', e);
+      console.warn("Failed to load settings from localStorage", e);
     }
     return DEFAULT_SETTINGS;
   });
@@ -42,26 +46,26 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Apply dark mode class to html element
   useEffect(() => {
     if (settings.darkMode) {
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove("dark");
     }
   }, [settings.darkMode]);
 
   // Apply RTL direction for Arabic
-  const dir = settings.language === 'ar' ? 'rtl' : 'ltr';
+  const dir = settings.language === "ar" ? "rtl" : "ltr";
   useEffect(() => {
-    document.documentElement.setAttribute('dir', dir);
-    document.documentElement.setAttribute('lang', settings.language);
+    document.documentElement.setAttribute("dir", dir);
+    document.documentElement.setAttribute("lang", settings.language);
   }, [dir, settings.language]);
 
   const updateSettings = (newSettings: Partial<SettingsState>) => {
     setSettings((prev) => {
       const updated = { ...prev, ...newSettings };
       try {
-        localStorage.setItem('finmate_settings', JSON.stringify(updated));
+        localStorage.setItem("finmate_settings", JSON.stringify(updated));
       } catch (e) {
-        console.warn('Failed to save settings', e);
+        console.warn("Failed to save settings", e);
       }
       return updated;
     });
@@ -107,7 +111,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
   if (!context) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
+    throw new Error("useLanguage must be used within a LanguageProvider");
   }
   return context;
 };

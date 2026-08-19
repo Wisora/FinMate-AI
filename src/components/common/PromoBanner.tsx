@@ -1,17 +1,20 @@
-import React, { useState } from 'react';
-import { Sparkles, ArrowRight, X, ShieldCheck } from 'lucide-react';
-import { useLanguage } from '../../i18n/LanguageContext';
+import React, { useState } from "react";
+import { Sparkles, ArrowRight, X, ShieldCheck } from "lucide-react";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 interface PromoBannerProps {
   onUpgradeClick: () => void;
-  userPlan: 'free' | 'pro';
+  userPlan: "free" | "pro";
 }
 
-export const PromoBanner: React.FC<PromoBannerProps> = ({ onUpgradeClick, userPlan }) => {
+export const PromoBanner: React.FC<PromoBannerProps> = ({
+  onUpgradeClick,
+  userPlan,
+}) => {
   const { t } = useLanguage();
   const [dismissed, setDismissed] = useState(false);
 
-  if (userPlan === 'pro' || dismissed) return null;
+  if (userPlan === "pro" || dismissed) return null;
 
   return (
     <div
@@ -26,15 +29,19 @@ export const PromoBanner: React.FC<PromoBannerProps> = ({ onUpgradeClick, userPl
           <div>
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 text-xs font-semibold uppercase tracking-wider bg-amber-400 text-slate-900 rounded-full">
-                {t('upgradeToPro')}
+                {t("upgradeToPro")}
               </span>
               <span className="text-xs text-emerald-100 flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5" /> 30-Day Money-Back Guarantee
+                <ShieldCheck className="w-3.5 h-3.5" /> 30-Day Money-Back
+                Guarantee
               </span>
             </div>
-            <h3 className="text-lg font-bold mt-1 text-white">{t('proBenefits')}</h3>
+            <h3 className="text-lg font-bold mt-1 text-white">
+              {t("proBenefits")}
+            </h3>
             <p className="text-xs text-emerald-100 mt-0.5">
-              Get priority Gemini AI insights, automated report PDF export, and unlimited goal tracking.
+              Get priority Gemini AI insights, automated report PDF export, and
+              unlimited goal tracking.
             </p>
           </div>
         </div>
@@ -42,10 +49,10 @@ export const PromoBanner: React.FC<PromoBannerProps> = ({ onUpgradeClick, userPl
         <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
           <button
             onClick={onUpgradeClick}
-            aria-label={t('upgradeToPro')}
+            aria-label={t("upgradeToPro")}
             className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white text-emerald-800 hover:bg-emerald-50 font-bold text-sm rounded-xl shadow-md transition-all duration-200 focus:ring-2 focus:ring-white focus:outline-none"
           >
-            <span>{t('upgradeToPro')}</span>
+            <span>{t("upgradeToPro")}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
           <button

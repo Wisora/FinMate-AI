@@ -1,26 +1,25 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
-
-async function main() {
-  // Clear existing users
-  await prisma.user.deleteMany();
-
-  // Seed a test user
-  await prisma.user.create({
-    data: {
-      email: 'test@example.com',
-      password: 'securepassword123',
-    },
-  });
+generator client {
+  provider = "prisma-client-js"
 }
 
-main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error('❌ Seeding failed:', e);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"   // <-- absolutely required
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
+  name         String?
+  createdAt    DateTime      @default(now())
+  transactions Transaction[]
+}
+
+model Transaction {
+  id        Int      @id @default(autoincrement())
+  amount    Float
+  currency  String
+  createdAt DateTime @default(now())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+}

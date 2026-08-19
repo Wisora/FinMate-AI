@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { useLanguage } from '../i18n/LanguageContext';
-import { UserProfile } from '../types';
-import { Spinner } from '../components/common/Spinner';
+import React, { useState } from "react";
+import { useLanguage } from "../i18n/LanguageContext";
+import { UserProfile } from "../types";
+import { Spinner } from "../components/common/Spinner";
 import {
   Crown,
   Check,
@@ -15,49 +15,59 @@ import {
   ArrowRight,
   Star,
   X,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface UpgradeProps {
   user: UserProfile;
-  onUpgradeSuccess: (newPlan: 'pro') => void;
-  showToast: (msg: string, type?: 'success' | 'warning' | 'error' | 'info') => void;
+  onUpgradeSuccess: (newPlan: "pro") => void;
+  showToast: (
+    msg: string,
+    type?: "success" | "warning" | "error" | "info",
+  ) => void;
 }
 
-export const Upgrade: React.FC<UpgradeProps> = ({ user, onUpgradeSuccess, showToast }) => {
+export const Upgrade: React.FC<UpgradeProps> = ({
+  user,
+  onUpgradeSuccess,
+  showToast,
+}) => {
   const { t, currency } = useLanguage();
 
   const [isAnnual, setIsAnnual] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  const isPro = user.plan === 'pro';
+  const isPro = user.plan === "pro";
 
   // Currency pricing display
   const monthlyPrices: Record<string, string> = {
-    USD: '$9.99',
-    EUR: '€9.20',
-    ZAR: 'R149',
-    GBP: '£7.99',
-    JPY: '¥1,500',
+    USD: "$9.99",
+    EUR: "€9.20",
+    ZAR: "R149",
+    GBP: "£7.99",
+    JPY: "¥1,500",
   };
 
   const annualPrices: Record<string, string> = {
-    USD: '$7.99',
-    EUR: '€7.40',
-    ZAR: 'R119',
-    GBP: '£6.40',
-    JPY: '¥1,200',
+    USD: "$7.99",
+    EUR: "€7.40",
+    ZAR: "R119",
+    GBP: "£6.40",
+    JPY: "¥1,200",
   };
 
   const priceDisplay = isAnnual
-    ? (annualPrices[currency] || '$7.99') + '/mo'
-    : (monthlyPrices[currency] || '$9.99') + '/mo';
+    ? (annualPrices[currency] || "$7.99") + "/mo"
+    : (monthlyPrices[currency] || "$9.99") + "/mo";
 
   const handleSimulateCheckout = () => {
     setLoading(true);
     setTimeout(() => {
-      onUpgradeSuccess('pro');
+      onUpgradeSuccess("pro");
       setLoading(false);
-      showToast('🎉 Congratulations! You are now a FinMate AI Pro member!', 'success');
+      showToast(
+        "🎉 Congratulations! You are now a FinMate AI Pro member!",
+        "success",
+      );
     }, 1200);
   };
 
@@ -75,12 +85,15 @@ export const Upgrade: React.FC<UpgradeProps> = ({ user, onUpgradeSuccess, showTo
         </h1>
 
         <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">
-          Unlock unlimited goals, automated PDF & CSV export reports, and priority Gemini 3.6 financial coaching.
+          Unlock unlimited goals, automated PDF & CSV export reports, and
+          priority Gemini 3.6 financial coaching.
         </p>
 
         {/* Annual / Monthly Toggle */}
         <div className="pt-4 flex items-center justify-center gap-3">
-          <span className={`text-xs font-bold ${!isAnnual ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>
+          <span
+            className={`text-xs font-bold ${!isAnnual ? "text-slate-900 dark:text-white" : "text-slate-500"}`}
+          >
             Monthly Billing
           </span>
 
@@ -90,12 +103,14 @@ export const Upgrade: React.FC<UpgradeProps> = ({ user, onUpgradeSuccess, showTo
           >
             <div
               className={`w-6 h-6 rounded-full bg-emerald-500 transition-transform ${
-                isAnnual ? 'translate-x-6' : 'translate-x-0'
+                isAnnual ? "translate-x-6" : "translate-x-0"
               }`}
             />
           </button>
 
-          <span className={`text-xs font-bold ${isAnnual ? 'text-slate-900 dark:text-white' : 'text-slate-500'} flex items-center gap-1.5`}>
+          <span
+            className={`text-xs font-bold ${isAnnual ? "text-slate-900 dark:text-white" : "text-slate-500"} flex items-center gap-1.5`}
+          >
             Annual Billing
             <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-[10px] font-extrabold uppercase">
               Save 20%
@@ -110,7 +125,9 @@ export const Upgrade: React.FC<UpgradeProps> = ({ user, onUpgradeSuccess, showTo
         <div className="p-8 rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between space-y-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white">Free Starter Tier</h3>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                Free Starter Tier
+              </h3>
               {!isPro && (
                 <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold">
                   Current Plan
@@ -119,8 +136,12 @@ export const Upgrade: React.FC<UpgradeProps> = ({ user, onUpgradeSuccess, showTo
             </div>
 
             <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-black text-slate-900 dark:text-white">$0</span>
-              <span className="text-xs text-slate-500 dark:text-slate-400">/ forever</span>
+              <span className="text-4xl font-black text-slate-900 dark:text-white">
+                $0
+              </span>
+              <span className="text-xs text-slate-500 dark:text-slate-400">
+                / forever
+              </span>
             </div>
 
             <p className="text-xs text-slate-600 dark:text-slate-300">
@@ -155,7 +176,7 @@ export const Upgrade: React.FC<UpgradeProps> = ({ user, onUpgradeSuccess, showTo
             disabled
             className="w-full py-3 rounded-2xl bg-slate-100 dark:bg-slate-700 text-slate-400 font-bold text-xs cursor-default text-center"
           >
-            {!isPro ? 'Your Current Active Tier' : 'Downgrade to Free'}
+            {!isPro ? "Your Current Active Tier" : "Downgrade to Free"}
           </button>
         </div>
 
@@ -172,34 +193,54 @@ export const Upgrade: React.FC<UpgradeProps> = ({ user, onUpgradeSuccess, showTo
             </div>
 
             <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-black text-white">{priceDisplay}</span>
-              <span className="text-xs text-slate-400">billed {isAnnual ? 'annually' : 'monthly'}</span>
+              <span className="text-4xl font-black text-white">
+                {priceDisplay}
+              </span>
+              <span className="text-xs text-slate-400">
+                billed {isAnnual ? "annually" : "monthly"}
+              </span>
             </div>
 
             <p className="text-xs text-slate-300 leading-relaxed">
-              Complete wealth coaching suite with zero goal limits and full exports.
+              Complete wealth coaching suite with zero goal limits and full
+              exports.
             </p>
 
             <ul className="space-y-3 pt-2 text-xs text-slate-200">
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span className="font-bold text-white">Unlimited Goals</span> (Savings, Debt, Investments)
+                <span className="font-bold text-white">
+                  Unlimited Goals
+                </span>{" "}
+                (Savings, Debt, Investments)
               </li>
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span className="font-bold text-white">Priority Gemini 3.6</span> Financial Coach
+                <span className="font-bold text-white">
+                  Priority Gemini 3.6
+                </span>{" "}
+                Financial Coach
               </li>
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span className="font-bold text-white">PDF & CSV Data Exports</span> for tax & records
+                <span className="font-bold text-white">
+                  PDF & CSV Data Exports
+                </span>{" "}
+                for tax & records
               </li>
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span className="font-bold text-white">Real-Time Overspending</span> Proactive Alerts
+                <span className="font-bold text-white">
+                  Real-Time Overspending
+                </span>{" "}
+                Proactive Alerts
               </li>
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span className="font-bold text-white">Advanced Historical</span> Analytics & Custom Ranges
+                <span className="font-bold text-white">
+                  Advanced Historical
+                </span>{" "}
+                Analytics & Custom Ranges
               </li>
             </ul>
           </div>
@@ -232,7 +273,8 @@ export const Upgrade: React.FC<UpgradeProps> = ({ user, onUpgradeSuccess, showTo
       <div className="p-6 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/40 text-center text-xs text-emerald-900 dark:text-emerald-200 flex flex-col sm:flex-row items-center justify-center gap-3">
         <ShieldCheck className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
         <span>
-          <strong>30-Day Money-Back Guarantee:</strong> Try FinMate Pro completely risk-free. Cancel anytime with 1 click in your Profile.
+          <strong>30-Day Money-Back Guarantee:</strong> Try FinMate Pro
+          completely risk-free. Cancel anytime with 1 click in your Profile.
         </span>
       </div>
     </div>

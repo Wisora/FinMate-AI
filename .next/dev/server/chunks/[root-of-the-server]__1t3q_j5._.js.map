@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 16, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Craig%20A/Desktop/finmate-ai/src/pages/api/subscriptions.ts"],"sourcesContent":["import { NextApiRequest, NextApiResponse } from \"next\";\r\nimport { PrismaClient } from \"@prisma/client\";\r\n\r\nconst prisma = new PrismaClient();\r\n\r\nexport default async function handler(req: NextApiRequest, res: NextApiResponse) {\r\n  try {\r\n    const subscriptions = await prisma.subscription.findMany();\r\n    res.status(200).json(subscriptions);\r\n  } catch (error) {\r\n    console.error(error);\r\n    res.status(500).json({ error: \"Failed to fetch subscriptions\" });\r\n  } finally {\r\n    await prisma.$disconnect();\r\n  }\r\n}\r\n"],"names":["prisma","handler","req","res","subscriptions","subscription","findMany","status","json","error","console","$disconnect"],"mappings":";;;;AACA;;AAEA,MAAMA,SAAS,IAAI,sMAAY;AAEhB,eAAeC,QAAQC,GAAmB,EAAEC,GAAoB;IAC7E,IAAI;QACF,MAAMC,gBAAgB,MAAMJ,OAAOK,YAAY,CAACC,QAAQ;QACxDH,IAAII,MAAM,CAAC,KAAKC,IAAI,CAACJ;IACvB,EAAE,OAAOK,OAAO;QACdC,QAAQD,KAAK,CAACA;QACdN,IAAII,MAAM,CAAC,KAAKC,IAAI,CAAC;YAAEC,OAAO;QAAgC;IAChE,SAAU;QACR,MAAMT,OAAOW,WAAW;IAC1B;AACF"}}]
-}

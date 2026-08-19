@@ -1,4 +1,4 @@
-export type GoalCategory = 'savings' | 'debt' | 'investment';
+export type GoalCategory = "savings" | "debt" | "investment";
 
 export interface Goal {
   id: string;
@@ -7,7 +7,7 @@ export interface Goal {
   currentAmount: number;
   targetAmount: number;
   targetDate: string;
-  priority: 'high' | 'medium' | 'low';
+  priority: "high" | "medium" | "low";
   isCompleted: boolean;
   notes?: string;
 }
@@ -16,20 +16,21 @@ export interface Transaction {
   id: string;
   title: string;
   amount: number;
-  type: 'income' | 'expense';
+  type: "income" | "expense";
   category: string;
   date: string;
   isRecurring?: boolean;
 }
 
-export type RecommendationCategory = 'budgeting' | 'savings' | 'debt' | 'investments';
+export type RecommendationCategory =
+  "budgeting" | "savings" | "debt" | "investments";
 
 export interface Recommendation {
   id: string;
   title: string;
   category: RecommendationCategory;
   description: string;
-  impact: 'high' | 'medium' | 'low';
+  impact: "high" | "medium" | "low";
   potentialSavings: number;
   actionText: string;
   applied: boolean;
@@ -53,7 +54,7 @@ export interface ReportData {
   createdAt: string;
 }
 
-export type PlanType = 'free' | 'pro';
+export type PlanType = "free" | "pro";
 
 export interface UserProfile {
   name: string;
@@ -66,8 +67,8 @@ export interface UserProfile {
   monthlyExpensesBudget: number;
 }
 
-export type CurrencyCode = 'USD' | 'EUR' | 'ZAR' | 'GBP' | 'JPY';
-export type LanguageCode = 'en' | 'af' | 'fr' | 'es' | 'ar';
+export type CurrencyCode = "USD" | "EUR" | "ZAR" | "GBP" | "JPY";
+export type LanguageCode = "en" | "af" | "fr" | "es" | "ar";
 
 export interface SettingsState {
   notificationsEnabled: boolean;
@@ -81,7 +82,7 @@ export interface SettingsState {
 
 export interface AlertItem {
   id: string;
-  type: 'warning' | 'success' | 'info';
+  type: "warning" | "success" | "info";
   title: string;
   message: string;
   date: string;
@@ -90,7 +91,7 @@ export interface AlertItem {
 
 export interface ChatMessage {
   id: string;
-  sender: 'user' | 'assistant';
+  sender: "user" | "assistant";
   text: string;
   timestamp: string;
   isFallback?: boolean;

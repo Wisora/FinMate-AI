@@ -3,7 +3,7 @@ name: ✨ Feature Request
 about: Suggest an idea or improvement for FinMate AI
 title: "[Feature]: "
 labels: enhancement
-assignees: ''
+assignees: ""
 ---
 
 ## ✨ Description

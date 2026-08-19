@@ -5,8 +5,8 @@ export default function AdminSubscriptions({ user }) {
 
   useEffect(() => {
     fetch("/api/subscriptions")
-      .then(res => res.json())
-      .then(data => setSubs(data));
+      .then((res) => res.json())
+      .then((data) => setSubs(data));
   }, []);
 
   if (user.role !== "admin") return <h2>Access denied</h2>;
@@ -17,11 +17,15 @@ export default function AdminSubscriptions({ user }) {
       <table>
         <thead>
           <tr>
-            <th>User</th><th>Plan</th><th>Status</th><th>Start</th><th>End</th>
+            <th>User</th>
+            <th>Plan</th>
+            <th>Status</th>
+            <th>Start</th>
+            <th>End</th>
           </tr>
         </thead>
         <tbody>
-          {subs.map(sub => (
+          {subs.map((sub) => (
             <tr key={sub.id}>
               <td>{sub.user_id}</td>
               <td>{sub.plan}</td>

@@ -2,7 +2,7 @@ name: Quarterly Investor Deck
 
 on:
   schedule:
-    - cron: "0 9 1 */3 *"   # runs on the 1st day of every 3rd month (quarterly)
+    - cron: "0 9 1 */3 *" # runs on the 1st day of every 3rd month (quarterly)
   workflow_dispatch:
 
 jobs:

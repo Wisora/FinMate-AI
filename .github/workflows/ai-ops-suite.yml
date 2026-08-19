@@ -2,11 +2,11 @@ name: AI Ops Suite
 
 on:
   schedule:
-    - cron: '0 2 * * 1'   # every Monday at 02:00 UTC
-  workflow_dispatch:       # allow manual trigger
+    - cron: "0 2 * * 1" # every Monday at 02:00 UTC
+  workflow_dispatch: # allow manual trigger
 
 env:
-  APP_NAME: FinMate AI   
+  APP_NAME: FinMate AI
 
 jobs:
   ai-ops:
@@ -21,8 +21,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: "18"
+          cache: "npm"
 
       # Install dependencies
       - name: Install dependencies
@@ -48,7 +48,7 @@ jobs:
       - name: Lighthouse CI
         uses: treosh/lighthouse-ci-action@v10
         with:
-          urls: 'http://localhost:3000'
+          urls: "http://localhost:3000"
           uploadArtifacts: true
           temporaryPublicStorage: true
 
@@ -63,9 +63,10 @@ jobs:
         with:
           title: "AI Ops Suite Report - ${{ env.APP_NAME }}"
           content-filepath: ./lighthouseci-results.md
-          labels: ai-ops, maintenance
+          labels:
+            ai-ops, maintenance
 
-                # 📊 Generate dynamic badges
+            # 📊 Generate dynamic badges
       - name: Generate badges
         run: |
           mkdir -p public/badges

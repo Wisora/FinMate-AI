@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { getAssistantResponse } from '../../services/assistantService';
+import React, { useState } from "react";
+import { getAssistantResponse } from "../../services/assistantService";
 
 function AssistantChat() {
   const [messages, setMessages] = useState([]);
@@ -14,7 +14,11 @@ function AssistantChat() {
   };
 
   return (
-    <div className="assistant-chat" role="region" aria-label="AI Assistant Chat">
+    <div
+      className="assistant-chat"
+      role="region"
+      aria-label="AI Assistant Chat"
+    >
       <h3>💬 FinMate AI Assistant</h3>
       <div className="chat-window">
         {messages.map((msg, idx) => (
@@ -24,11 +28,11 @@ function AssistantChat() {
         ))}
       </div>
       <div className="chat-input">
-        <input 
-          type="text" 
-          value={input} 
-          onChange={(e) => setInput(e.target.value)} 
-          placeholder="Ask me about savings, reports, or goals..." 
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Ask me about savings, reports, or goals..."
           aria-label="Chat input"
         />
         <button onClick={handleSend}>Send</button>

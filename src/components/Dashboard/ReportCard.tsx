@@ -1,6 +1,12 @@
-import React from 'react';
-import { useLanguage } from '../../i18n/LanguageContext';
-import { TrendingUp, TrendingDown, Sparkles, FileText, ArrowRight } from 'lucide-react';
+import React from "react";
+import { useLanguage } from "../../i18n/LanguageContext";
+import {
+  TrendingUp,
+  TrendingDown,
+  Sparkles,
+  FileText,
+  ArrowRight,
+} from "lucide-react";
 
 interface ReportCardProps {
   timeframe: string;
@@ -34,8 +40,12 @@ export const ReportCard: React.FC<ReportCardProps> = ({
               <FileText className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="font-bold text-slate-900 dark:text-white text-base">{timeframe} Financial Summary</h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Monthly Cashflow Performance</p>
+              <h4 className="font-bold text-slate-900 dark:text-white text-base">
+                {timeframe} Financial Summary
+              </h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Monthly Cashflow Performance
+              </p>
             </div>
           </div>
           <span className="px-3 py-1 text-xs font-semibold rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300">
@@ -46,7 +56,9 @@ export const ReportCard: React.FC<ReportCardProps> = ({
         {/* Stats Grid */}
         <div className="grid grid-cols-3 gap-3 mb-5 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
           <div>
-            <span className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Income</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 block mb-1">
+              Income
+            </span>
             <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
               <TrendingUp className="w-3.5 h-3.5" />
               {formatCurrency(income)}
@@ -54,7 +66,9 @@ export const ReportCard: React.FC<ReportCardProps> = ({
           </div>
 
           <div>
-            <span className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Expenses</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 block mb-1">
+              Expenses
+            </span>
             <span className="text-sm font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1">
               <TrendingDown className="w-3.5 h-3.5" />
               {formatCurrency(expenses)}
@@ -62,7 +76,9 @@ export const ReportCard: React.FC<ReportCardProps> = ({
           </div>
 
           <div>
-            <span className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Net Surplus</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 block mb-1">
+              Net Surplus
+            </span>
             <span className="text-sm font-bold text-slate-900 dark:text-white">
               {formatCurrency(netSavings)}
             </span>
@@ -73,7 +89,9 @@ export const ReportCard: React.FC<ReportCardProps> = ({
           <div className="mb-4">
             <div className="flex justify-between text-xs text-slate-600 dark:text-slate-300 mb-1 font-medium">
               <span>Top Spending: {topCategory.category}</span>
-              <span>{formatCurrency(topCategory.amount)} ({topCategory.percentage}%)</span>
+              <span>
+                {formatCurrency(topCategory.amount)} ({topCategory.percentage}%)
+              </span>
             </div>
             <div className="w-full h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
               <div

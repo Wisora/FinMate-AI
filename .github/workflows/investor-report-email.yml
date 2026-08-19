@@ -2,7 +2,7 @@ name: Email Investor Reports (Dual Theme)
 
 on:
   schedule:
-    - cron: "0 11 * * 1"   # every Monday at 11:00 UTC
+    - cron: "0 11 * * 1" # every Monday at 11:00 UTC
   workflow_dispatch:
 
 jobs:

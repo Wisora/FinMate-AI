@@ -1,8 +1,8 @@
-import express from 'express';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { createServer as createViteServer } from 'vite';
-import { GoogleGenAI } from '@google/genai';
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+import { createServer as createViteServer } from "vite";
+import { GoogleGenAI } from "@google/genai";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,7 +11,7 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(express.json({ limit: '2mb' }));
+  app.use(express.json({ limit: "2mb" }));
 
   // Initialize Gemini AI client
   let ai: GoogleGenAI | null = null;
@@ -21,34 +21,45 @@ async function startServer() {
         apiKey: process.env.GEMINI_API_KEY,
         httpOptions: {
           headers: {
-            'User-Agent': 'aistudio-build',
+            "User-Agent": "aistudio-build",
           },
         },
       });
     } catch (err) {
-      console.warn('Failed to initialize GoogleGenAI with provided key:', err);
+      console.warn("Failed to initialize GoogleGenAI with provided key:", err);
     }
   }
 
   // Health check API endpoint
-  app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', time: new Date().toISOString() });
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "ok", time: new Date().toISOString() });
   });
 
   // AI Assistant Chat Route
-  app.post('/api/chat', async (req, res) => {
+  app.post("/api/chat", async (req, res) => {
     try {
-      const { message, history, financialSummary, language = 'English', currency = 'USD' } = req.body;
+      const {
+        message,
+        history,
+        financialSummary,
+        language = "English",
+        currency = "USD",
+      } = req.body;
 
-      if (!message || typeof message !== 'string') {
-        return res.status(400).json({ error: 'Message is required' });
+      if (!message || typeof message !== "string") {
+        return res.status(400).json({ error: "Message is required" });
       }
 
       // Check if AI client is initialized
       const apiKey = process.env.GEMINI_API_KEY;
       if (!ai || !apiKey) {
         // Fallback intelligent response when API key is not configured
-        const fallbackText = generateFallbackResponse(message, financialSummary, language, currency);
+        const fallbackText = generateFallbackResponse(
+          message,
+          financialSummary,
+          language,
+          currency,
+        );
         return res.json({ response: fallbackText, isFallback: true });
       }
 
@@ -76,12 +87,18 @@ Instructions:
       // Build conversation contents
       let promptText = message;
       if (history && Array.isArray(history) && history.length > 0) {
-        const recentHistory = history.slice(-6).map((h: { sender: string; text: string }) => `${h.sender === 'user' ? 'User' : 'Assistant'}: ${h.text}`).join('\n');
+        const recentHistory = history
+          .slice(-6)
+          .map(
+            (h: { sender: string; text: string }) =>
+              `${h.sender === "user" ? "User" : "Assistant"}: ${h.text}`,
+          )
+          .join("\n");
         promptText = `Previous Conversation:\n${recentHistory}\n\nUser: ${message}`;
       }
 
       const result = await ai.models.generateContent({
-        model: 'gemini-3.6-flash',
+        model: "gemini-3.6-flash",
         contents: promptText,
         config: {
           systemInstruction: systemPrompt,
@@ -89,30 +106,46 @@ Instructions:
         },
       });
 
-      const replyText = result.text || 'I apologize, I could not process your financial query at this moment.';
+      const replyText =
+        result.text ||
+        "I apologize, I could not process your financial query at this moment.";
       return res.json({ response: replyText, isFallback: false });
     } catch (err: any) {
-      console.error('Error in /api/chat:', err);
+      console.error("Error in /api/chat:", err);
       // Fallback on error so the user never gets an unhandled crash
       const fallbackText = generateFallbackResponse(
-        req.body?.message || '',
+        req.body?.message || "",
         req.body?.financialSummary,
-        req.body?.language || 'English',
-        req.body?.currency || 'USD'
+        req.body?.language || "English",
+        req.body?.currency || "USD",
       );
-      return res.json({ response: fallbackText, isFallback: true, errorNote: err.message });
+      return res.json({
+        response: fallbackText,
+        isFallback: true,
+        errorNote: err.message,
+      });
     }
   });
 
   // AI Report Summary Route
-  app.post('/api/reports/ai-summary', async (req, res) => {
+  app.post("/api/reports/ai-summary", async (req, res) => {
     try {
-      const { timeframe = 'July', financialData, language = 'English', currency = 'USD' } = req.body;
+      const {
+        timeframe = "July",
+        financialData,
+        language = "English",
+        currency = "USD",
+      } = req.body;
 
       const apiKey = process.env.GEMINI_API_KEY;
       if (!ai || !apiKey) {
         return res.json({
-          summary: generateReportFallback(timeframe, financialData, language, currency),
+          summary: generateReportFallback(
+            timeframe,
+            financialData,
+            language,
+            currency,
+          ),
           isFallback: true,
         });
       }
@@ -131,7 +164,7 @@ Structure your analysis:
 4. 3 Actionable Recommendations for Next Month`;
 
       const result = await ai.models.generateContent({
-        model: 'gemini-3.6-flash',
+        model: "gemini-3.6-flash",
         contents: `Generate the ${timeframe} Financial Performance Report Analysis.`,
         config: {
           systemInstruction: systemPrompt,
@@ -140,13 +173,13 @@ Structure your analysis:
 
       return res.json({ summary: result.text, isFallback: false });
     } catch (err: any) {
-      console.error('Error in /api/reports/ai-summary:', err);
+      console.error("Error in /api/reports/ai-summary:", err);
       return res.json({
         summary: generateReportFallback(
-          req.body?.timeframe || 'Current Period',
+          req.body?.timeframe || "Current Period",
           req.body?.financialData,
-          req.body?.language || 'English',
-          req.body?.currency || 'USD'
+          req.body?.language || "English",
+          req.body?.currency || "USD",
         ),
         isFallback: true,
       });
@@ -154,33 +187,42 @@ Structure your analysis:
   });
 
   // Vite development middleware vs Static Production serving
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },
-      appType: 'spa',
+      appType: "spa",
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(process.cwd(), 'dist');
+    const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
+  app.listen(PORT, "0.0.0.0", () => {
     console.log(`FinMate AI Server running on http://0.0.0.0:${PORT}`);
   });
 }
 
 // Fallback generator helper functions for robust offline operation
-function generateFallbackResponse(msg: string, summary: any, lang: string, symbol: string): string {
+function generateFallbackResponse(
+  msg: string,
+  summary: any,
+  lang: string,
+  symbol: string,
+): string {
   const lower = msg.toLowerCase();
   const inc = summary?.income || 5200;
   const exp = summary?.expenses || 3400;
   const sav = summary?.netSavings || inc - exp;
 
-  if (lower.includes('save') || lower.includes('savings') || lower.includes('saved')) {
+  if (
+    lower.includes("save") ||
+    lower.includes("savings") ||
+    lower.includes("saved")
+  ) {
     return `📊 **Savings Summary**:
 Based on your records, your net monthly savings rate is currently **${Math.round((sav / inc) * 100)}%** (${symbol} ${sav.toLocaleString()}).
 • **Total Saved**: ${symbol} ${sav.toLocaleString()} this month
@@ -188,7 +230,11 @@ Based on your records, your net monthly savings rate is currently **${Math.round
 • **Advice**: Setting up an automated transfer on payday helps keep your savings momentum consistent!`;
   }
 
-  if (lower.includes('report') || lower.includes('july') || lower.includes('expense')) {
+  if (
+    lower.includes("report") ||
+    lower.includes("july") ||
+    lower.includes("expense")
+  ) {
     return `📑 **FinMate July Financial Summary Report**:
 • **Total Income**: ${symbol} ${inc.toLocaleString()}
 • **Total Expenses**: ${symbol} ${exp.toLocaleString()}
@@ -197,7 +243,11 @@ Based on your records, your net monthly savings rate is currently **${Math.round
 • **Key Insight**: Your spending is within 65% of your total budget. Consider moving an extra ${symbol} 200 into your High-Yield Emergency Fund goal!`;
   }
 
-  if (lower.includes('debt') || lower.includes('loan') || lower.includes('card')) {
+  if (
+    lower.includes("debt") ||
+    lower.includes("loan") ||
+    lower.includes("card")
+  ) {
     return `💳 **Debt Strategy Recommendation**:
 • **Current Total Debt Target**: ${symbol} ${summary?.totalDebtGoals || 8500}
 • **Recommended Method**: Avalanche Method (Pay off highest interest rate first while paying minimums on others) or Snowball Method (smallest balance first for psychological wins).
@@ -211,7 +261,12 @@ I analyzed your current financial metrics:
 • **Key Tip**: You have a safe savings buffer of ${symbol} ${sav}. You can ask me specific questions like *"How much did I save last month?"*, *"How do I invest my surplus?"*, or *"Generate a July expense report"*.`;
 }
 
-function generateReportFallback(period: string, data: any, lang: string, symbol: string): string {
+function generateReportFallback(
+  period: string,
+  data: any,
+  lang: string,
+  symbol: string,
+): string {
   return `📈 **FinMate Financial Analysis (${period})**:
   
 ### 1. Executive Summary

@@ -48,7 +48,7 @@ const translations = {
     addGoal: "إضافة هدف",
     addProgress: "إضافة تقدم",
     generateReport: "إنشاء تقرير",
-  }
+  },
 };
 
 export default translations;

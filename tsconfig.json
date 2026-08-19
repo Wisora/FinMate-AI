@@ -2,12 +2,20 @@
   "compilerOptions": {
     "target": "es2019",
     "module": "commonjs",
-    "rootDir": "./",          // 👈 add this line
-    "outDir": "./dist",       // compiled JS goes here
+    "rootDir": "./", // 👈 add this line
+    "outDir": "./dist", // compiled JS goes here
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": ["node"]
+    "types": ["node"],
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "noEmit": true,
+    "incremental": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve"
   },
   "include": ["prisma/**/*.ts", "pages/**/*.ts", "pages/**/*.tsx"],
   "exclude": ["node_modules"]

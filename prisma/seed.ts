@@ -1,25 +1,43 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // Seed a test user
-  await prisma.user.create({
+  // Create fake users
+  const user1 = await prisma.user.create({
     data: {
-      email: 'test@example.com',
-      password: 'securepassword123', // matches schema
+      email: "alice@example.com",
+      name: "Alice",
+      transactions: {
+        create: [
+          { amount: 100.5, currency: "USD" },
+          { amount: 250.0, currency: "EUR" },
+        ],
+      },
     },
   });
 
-  // Add more seed data here if needed
+  const user2 = await prisma.user.create({
+    data: {
+      email: "bob@example.com",
+      name: "Bob",
+      transactions: {
+        create: [
+          { amount: 75.0, currency: "USD" },
+          { amount: 300.0, currency: "ZAR" },
+        ],
+      },
+    },
+  });
+
+  console.log("Seeded users:", user1, user2);
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error('❌ Seeding failed:', e);
-    await prisma.$disconnect();
+  .catch((e) => {
+    console.error(e);
     process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
   });

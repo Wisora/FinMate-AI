@@ -8,7 +8,7 @@ export async function getUserProfile() {
         name: "Craig",
         email: "craig@example.com",
         plan: "Free Plan",
-        avatarUrl: null // optional: add avatar support
+        avatarUrl: null, // optional: add avatar support
       });
     }, 500);
   });

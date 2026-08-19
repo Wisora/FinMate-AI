@@ -1,7 +1,13 @@
-import React from 'react';
-import { Goal } from '../../types';
-import { useLanguage } from '../../i18n/LanguageContext';
-import { PiggyBank, CreditCard, TrendingUp, CheckCircle, Clock } from 'lucide-react';
+import React from "react";
+import { Goal } from "../../types";
+import { useLanguage } from "../../i18n/LanguageContext";
+import {
+  PiggyBank,
+  CreditCard,
+  TrendingUp,
+  CheckCircle,
+  Clock,
+} from "lucide-react";
 
 interface GoalCardProps {
   goal: Goal;
@@ -9,27 +15,40 @@ interface GoalCardProps {
   onAddProgress: (goal: Goal, deltaAmount: number) => void;
 }
 
-export const GoalCard: React.FC<GoalCardProps> = ({ goal, onEdit, onAddProgress }) => {
+export const GoalCard: React.FC<GoalCardProps> = ({
+  goal,
+  onEdit,
+  onAddProgress,
+}) => {
   const { formatCurrency, t } = useLanguage();
 
-  const percentage = Math.min(100, Math.round((goal.currentAmount / (goal.targetAmount || 1)) * 100));
+  const percentage = Math.min(
+    100,
+    Math.round((goal.currentAmount / (goal.targetAmount || 1)) * 100),
+  );
 
   const categoryIcons = {
-    savings: <PiggyBank className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />,
+    savings: (
+      <PiggyBank className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+    ),
     debt: <CreditCard className="w-5 h-5 text-rose-600 dark:text-rose-400" />,
-    investment: <TrendingUp className="w-5 h-5 text-sky-600 dark:text-sky-400" />,
+    investment: (
+      <TrendingUp className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+    ),
   };
 
   const categoryColors = {
-    savings: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
-    debt: 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border-rose-200 dark:border-rose-800',
-    investment: 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300 border-sky-200 dark:border-sky-800',
+    savings:
+      "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
+    debt: "bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border-rose-200 dark:border-rose-800",
+    investment:
+      "bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300 border-sky-200 dark:border-sky-800",
   };
 
   const barColors = {
-    savings: 'bg-emerald-500 dark:bg-emerald-400',
-    debt: 'bg-rose-500 dark:bg-rose-400',
-    investment: 'bg-sky-500 dark:bg-sky-400',
+    savings: "bg-emerald-500 dark:bg-emerald-400",
+    debt: "bg-rose-500 dark:bg-rose-400",
+    investment: "bg-sky-500 dark:bg-sky-400",
   };
 
   return (
@@ -41,11 +60,15 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, onEdit, onAddProgress 
       <div>
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-center gap-2.5">
-            <div className={`p-2.5 rounded-xl border ${categoryColors[goal.category]}`}>
+            <div
+              className={`p-2.5 rounded-xl border ${categoryColors[goal.category]}`}
+            >
               {categoryIcons[goal.category]}
             </div>
             <div>
-              <h4 className="font-semibold text-slate-900 dark:text-white text-base leading-snug">{goal.title}</h4>
+              <h4 className="font-semibold text-slate-900 dark:text-white text-base leading-snug">
+                {goal.title}
+              </h4>
               <span className="text-xs font-medium text-slate-500 dark:text-slate-400 capitalize flex items-center gap-1 mt-0.5">
                 <Clock className="w-3 h-3" /> Target: {goal.targetDate}
               </span>
@@ -55,7 +78,7 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, onEdit, onAddProgress 
             onClick={() => onEdit(goal)}
             className="text-xs font-medium text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
           >
-            {t('editGoal')}
+            {t("editGoal")}
           </button>
         </div>
 

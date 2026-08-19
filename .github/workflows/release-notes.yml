@@ -3,7 +3,7 @@ name: Automated Release Notes
 on:
   push:
     tags:
-      - 'v*.*.*'   # triggers on version tags like v1.2.3
+      - "v*.*.*" # triggers on version tags like v1.2.3
   workflow_dispatch:
 
 jobs:
