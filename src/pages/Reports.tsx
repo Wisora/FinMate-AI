@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { useLanguage } from "../i18n/LanguageContext";
-import { UserProfile } from "../types";
+import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../i18n/LanguageContext';
+import { UserProfile } from '../types';
 import {
   getFinancialSummary,
   getCategoryBreakdown,
   fetchAISummaryReport,
-} from "../services/reportsService";
-import { Spinner } from "../components/common/Spinner";
-import { PromoBanner } from "../components/common/PromoBanner";
+} from '../services/reportsService';
+import { Spinner } from '../components/common/Spinner';
+import { PromoBanner } from '../components/common/PromoBanner';
 import {
   PieChart as PieChartIcon,
   BarChart3,
@@ -21,14 +21,14 @@ import {
   FileSpreadsheet,
   FileText,
   CheckCircle2,
-} from "lucide-react";
+} from 'lucide-react';
 
 interface ReportsProps {
   user: UserProfile;
   onNavigate: (tab: string) => void;
   showToast: (
     msg: string,
-    type?: "success" | "warning" | "error" | "info",
+    type?: 'success' | 'warning' | 'error' | 'info'
   ) => void;
 }
 
@@ -39,7 +39,7 @@ export const Reports: React.FC<ReportsProps> = ({
 }) => {
   const { formatCurrency, t, language, currency } = useLanguage();
 
-  const [timeframe, setTimeframe] = useState("July 2026");
+  const [timeframe, setTimeframe] = useState('July 2026');
   const [summary, setSummary] = useState(getFinancialSummary());
   const [categories, setCategories] = useState(getCategoryBreakdown());
 
@@ -57,54 +57,54 @@ export const Reports: React.FC<ReportsProps> = ({
       const text = await fetchAISummaryReport(timeframe, language, currency);
       setAiReportText(text);
       showToast(
-        "AI Financial Analysis Report generated successfully!",
-        "success",
+        'AI Financial Analysis Report generated successfully!',
+        'success'
       );
     } catch (err) {
-      showToast("Failed to generate report analysis.", "error");
+      showToast('Failed to generate report analysis.', 'error');
     } finally {
       setGeneratingAI(false);
     }
   };
 
-  const handleExport = (type: "pdf" | "csv") => {
-    if (user.plan === "free") {
-      showToast(t("upgradePrompt"), "warning");
-      onNavigate("upgrade");
+  const handleExport = (type: 'pdf' | 'csv') => {
+    if (user.plan === 'free') {
+      showToast(t('upgradePrompt'), 'warning');
+      onNavigate('upgrade');
       return;
     }
 
-    if (type === "csv") {
+    if (type === 'csv') {
       const csvContent =
-        "data:text/csv;charset=utf-8,Category,Amount,Percentage\n" +
+        'data:text/csv;charset=utf-8,Category,Amount,Percentage\n' +
         categories
           .map((c) => `"${c.category}",${c.amount},${c.percentage}%`)
-          .join("\n");
+          .join('\n');
       const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
       link.setAttribute(
-        "download",
-        `FinMate_Financial_Report_${timeframe.replace(" ", "_")}.csv`,
+        'download',
+        `FinMate_Financial_Report_${timeframe.replace(' ', '_')}.csv`
       );
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast("CSV Report exported successfully!", "success");
+      showToast('CSV Report exported successfully!', 'success');
     } else {
       // Simulate PDF print trigger
       window.print();
-      showToast("Preparing PDF print preview...", "info");
+      showToast('Preparing PDF print preview...', 'info');
     }
   };
 
   // Sample historical monthly data for bar chart visualization
   const monthlyData = [
-    { month: "Mar", income: 5100, expenses: 3800 },
-    { month: "Apr", income: 5200, expenses: 3600 },
-    { month: "May", income: 5800, expenses: 3900 },
-    { month: "Jun", income: 5900, expenses: 3700 },
-    { month: "Jul", income: summary.income, expenses: summary.expenses },
+    { month: 'Mar', income: 5100, expenses: 3800 },
+    { month: 'Apr', income: 5200, expenses: 3600 },
+    { month: 'May', income: 5800, expenses: 3900 },
+    { month: 'Jun', income: 5900, expenses: 3700 },
+    { month: 'Jul', income: summary.income, expenses: summary.expenses },
   ];
 
   const maxChartVal =
@@ -114,7 +114,7 @@ export const Reports: React.FC<ReportsProps> = ({
     <div className="space-y-8 max-w-7xl mx-auto pb-12">
       {/* Top Banner */}
       <PromoBanner
-        onUpgradeClick={() => onNavigate("upgrade")}
+        onUpgradeClick={() => onNavigate('upgrade')}
         userPlan={user.plan}
       />
 
@@ -148,23 +148,23 @@ export const Reports: React.FC<ReportsProps> = ({
           </div>
 
           <button
-            onClick={() => handleExport("csv")}
+            onClick={() => handleExport('csv')}
             className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 shadow-sm transition-colors"
           >
             <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span>{t("exportCSV")}</span>
-            {user.plan === "free" && (
+            <span>{t('exportCSV')}</span>
+            {user.plan === 'free' && (
               <Lock className="w-3 h-3 text-amber-500 ml-0.5" />
             )}
           </button>
 
           <button
-            onClick={() => handleExport("pdf")}
+            onClick={() => handleExport('pdf')}
             className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-colors"
           >
             <Download className="w-4 h-4" />
-            <span>{t("exportPDF")}</span>
-            {user.plan === "free" && (
+            <span>{t('exportPDF')}</span>
+            {user.plan === 'free' && (
               <Lock className="w-3 h-3 text-amber-300 ml-0.5" />
             )}
           </button>
@@ -343,8 +343,8 @@ export const Reports: React.FC<ReportsProps> = ({
             )}
             <span>
               {generatingAI
-                ? "Analyzing Financial Data..."
-                : t("generateReport")}
+                ? 'Analyzing Financial Data...'
+                : t('generateReport')}
             </span>
           </button>
         </div>
@@ -361,7 +361,7 @@ export const Reports: React.FC<ReportsProps> = ({
               No AI synthesis report generated yet for {timeframe}.
             </p>
             <p className="text-xs text-slate-400">
-              Click "{t("generateReport")}" above to synthesize your financial
+              Click "{t('generateReport')}" above to synthesize your financial
               metrics.
             </p>
           </div>

@@ -1,7 +1,7 @@
-import React from "react";
-import { useLanguage } from "../i18n/LanguageContext";
-import { UserProfile } from "../types";
-import { PromoBanner } from "../components/common/PromoBanner";
+import React from 'react';
+import { useLanguage } from '../i18n/LanguageContext';
+import { UserProfile } from '../types';
+import { PromoBanner } from '../components/common/PromoBanner';
 import {
   Wallet,
   Sparkles,
@@ -13,7 +13,7 @@ import {
   CheckCircle2,
   Globe,
   Award,
-} from "lucide-react";
+} from 'lucide-react';
 
 interface HomeProps {
   onNavigate: (tab: string) => void;
@@ -27,7 +27,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, user }) => {
     <div className="space-y-8 max-w-7xl mx-auto">
       {/* Top Banner */}
       <PromoBanner
-        onUpgradeClick={() => onNavigate("upgrade")}
+        onUpgradeClick={() => onNavigate('upgrade')}
         userPlan={user.plan}
       />
 
@@ -43,7 +43,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, user }) => {
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight text-white">
-            Take Control of Your Savings, Debt & Investments with{" "}
+            Take Control of Your Savings, Debt & Investments with{' '}
             <span className="text-emerald-400">FinMate AI</span>
           </h1>
 
@@ -56,7 +56,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, user }) => {
 
           <div className="flex flex-wrap items-center gap-4 pt-2">
             <button
-              onClick={() => onNavigate("dashboard")}
+              onClick={() => onNavigate('dashboard')}
               className="px-6 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm shadow-lg shadow-emerald-500/25 flex items-center gap-2.5 transition-all duration-200"
             >
               <span>Go to Financial Dashboard</span>
@@ -64,7 +64,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, user }) => {
             </button>
 
             <button
-              onClick={() => onNavigate("reports")}
+              onClick={() => onNavigate('reports')}
               className="px-6 py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-sm border border-slate-700 flex items-center gap-2 transition-all duration-200"
             >
               <PieChart className="w-4 h-4 text-emerald-400" />
@@ -89,7 +89,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, user }) => {
             updates.
           </p>
           <button
-            onClick={() => onNavigate("dashboard")}
+            onClick={() => onNavigate('dashboard')}
             className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline inline-flex items-center gap-1 pt-1"
           >
             Manage Goals &rarr;
@@ -109,7 +109,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, user }) => {
             answers.
           </p>
           <button
-            onClick={() => onNavigate("dashboard")}
+            onClick={() => onNavigate('dashboard')}
             className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1 pt-1"
           >
             Chat with FinMate &rarr;
@@ -129,7 +129,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, user }) => {
             currencies.
           </p>
           <button
-            onClick={() => onNavigate("settings")}
+            onClick={() => onNavigate('settings')}
             className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline inline-flex items-center gap-1 pt-1"
           >
             Configure Settings &rarr;
@@ -150,7 +150,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, user }) => {
             </p>
           </div>
           <button
-            onClick={() => onNavigate("upgrade")}
+            onClick={() => onNavigate('upgrade')}
             className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-extrabold text-xs shadow-md"
           >
             Explore Free vs Pro Tiers
