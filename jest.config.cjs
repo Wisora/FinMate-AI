@@ -1,19 +1,14 @@
-module.exports = {
-  transform: {
-    "^.+\\.[tj]sx?$": "babel-jest"
-  },
-  setupFilesAfterEnv: ["@testing-library/jest-dom"],
-  moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json", "node"],
-  testEnvironment: "jsdom",
+const nextJest = require('next/jest');
 
-  // Explicitly tell Jest where your tests live
-  roots: ["<rootDir>/tests"],
+const createJestConfig = nextJest({
+  dir: './',
+});
 
-  // Match all test files inside that folder
-  testMatch: ["**/*.test.(ts|tsx|js)"],
-
-  // Force resolution of testing-library/react
-  moduleNameMapper: {
-    "^@testing-library/react$": "<rootDir>/node_modules/@testing-library/react"
-  }
+const customJestConfig = {
+  setupFilesAfterEnv: ['<rootDir>/node_modules/@testing-library/jest-dom'],
+  testEnvironment: 'jsdom',
+  roots: ['<rootDir>/tests'],
+  testMatch: ['**/*.test.(ts|tsx|js)'],
 };
+
+module.exports = createJestConfig(customJestConfig);
