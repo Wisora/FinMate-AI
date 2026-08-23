@@ -361,7 +361,7 @@ export const Reports: React.FC<ReportsProps> = ({
               No AI synthesis report generated yet for {timeframe}.
             </p>
             <p className="text-xs text-slate-400">
-              Click "{t('generateReport')}" above to synthesize your financial
+              Click {t('generateReport')} above to synthesize your financial
               metrics.
             </p>
           </div>
