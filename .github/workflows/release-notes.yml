@@ -17,7 +17,7 @@ jobs:
 
       # Generate changelog using Conventional Commits
       - name: Generate changelog
-        uses: mikepenz/release-changelog-builder-action@v5
+        uses: mikepenz/release-changelog-builder-action@v6
         with:
           configuration: '.github/changelog-config.json'
         env:
