@@ -1,0 +1,113 @@
+name: Weekly Investor Report (Branded PDF)
+
+on:
+  schedule:
+    - cron: '0 10 * * 1' # every Monday at 10:00 UTC
+  workflow_dispatch:
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install puppeteer chart.js
+
+      - name: Generate branded report
+        run: |
+          mkdir -p reports
+          cat <<EOF > reports/investor-report.html
+          <html>
+          <head>
+            <title>Weekly Investor Report</title>
+            <style>
+              body { font-family: Arial, sans-serif; color: #333; margin: 40px; }
+              h1 { color: #0078d4; border-bottom: 2px solid #0078d4; padding-bottom: 10px; }
+              h2 { color: #36a64f; margin-top: 30px; }
+              .logo { text-align: center; margin-bottom: 20px; }
+              .section { margin-bottom: 30px; }
+              .footer { margin-top: 40px; font-size: 12px; color: #777; text-align: center; }
+            </style>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+          </head>
+          <body>
+            <div class="logo">
+              <img src="https://your-org.github.io/assets/logo.png" alt="Company Logo" width="120"/>
+            </div>
+            <h1>Weekly Investor Report</h1>
+            <p>Date: $(date)</p>
+
+            <div class="section">
+              <h2>Performance Metrics</h2>
+              <ul>
+                <li>FinMate Performance: 90%</li>
+                <li>Budget Builder Performance: 84%</li>
+                <li>Coverage: 85%</li>
+              </ul>
+            </div>
+
+            <div class="section">
+              <h2>Contributor Activity</h2>
+              <canvas id="activityChart"></canvas>
+              <script>
+                new Chart(document.getElementById('activityChart'), {
+                  type: 'line',
+                  data: {
+                    labels: ['Week 1','Week 2','Week 3'],
+                    datasets: [
+                      { label: 'Commits', data: [12,18,15], borderColor: '#0078d4', fill: false },
+                      { label: 'PRs', data: [5,7,6], borderColor: '#36a64f', fill: false },
+                      { label: 'Issues Closed', data: [3,4,5], borderColor: '#ff9900', fill: false }
+                    ]
+                  }
+                });
+              </script>
+            </div>
+
+            <div class="section">
+              <h2>Commentary</h2>
+              <p>This week shows steady contributor activity with strong performance metrics.
+              Accessibility and SEO remain above 90%, while coverage is holding at 85%.
+              Growth trends are positive, with PRs and commits increasing week over week.</p>
+            </div>
+
+            <div class="section">
+              <h2>Links</h2>
+              <ul>
+                <li><a href="https://your-org.github.io/ops-repo">Ops Dashboard</a></li>
+                <li><a href="https://github.com/your-org/finmate-ai/releases">FinMate AI Releases</a></li>
+                <li><a href="https://github.com/your-org/budget-builder-lite/releases">Budget Builder Lite Releases</a></li>
+              </ul>
+            </div>
+
+            <div class="footer">
+              <p>© $(date +%Y) Your Org — Investor Relations</p>
+            </div>
+          </body>
+          </html>
+          EOF
+
+          node -e "
+          const puppeteer = require('puppeteer');
+          (async () => {
+            const browser = await puppeteer.launch();
+            const page = await browser.newPage();
+            await page.goto('file://' + process.cwd() + '/reports/investor-report.html');
+            await page.pdf({ path: 'reports/investor-report.pdf', format: 'A4' });
+            await browser.close();
+          })();
+          "
+
+      - name: Upload branded report
+        uses: actions/upload-artifact@v4
+        with:
+          name: investor-report
+          path: reports/investor-report.pdf

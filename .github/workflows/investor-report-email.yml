@@ -1,0 +1,93 @@
+name: Email Investor Reports (Dual Theme)
+
+on:
+  schedule:
+    - cron: '0 11 * * 1' # every Monday at 11:00 UTC
+  workflow_dispatch:
+
+jobs:
+  email-finmate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download FinMate report
+        uses: actions/download-artifact@v4
+        with:
+          name: investor-report-finmate
+          path: ./reports
+
+      - name: Send FinMate investor email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.INVESTOR_EMAIL_USER }}
+          password: ${{ secrets.INVESTOR_EMAIL_PASS }}
+          subject: "FinMate AI Investor Report - $(date +'%Y-%m-%d')"
+          to: investors@your-org.com
+          from: 'FinMate AI <reports@your-org.com>'
+          html_body: |
+            <html>
+              <body style="font-family: Arial, sans-serif; color: #333;">
+                <div style="max-width: 600px; margin: auto; border: 2px solid #0078d4; padding: 20px; border-radius: 8px;">
+                  <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="https://your-org.github.io/assets/finmate-logo.png" alt="FinMate AI Logo" width="120"/>
+                  </div>
+                  <h2 style="color: #0078d4;">FinMate AI Weekly Investor Report</h2>
+                  <p>Hello Investors,</p>
+                  <p>Please find attached the latest FinMate AI investor report. It includes performance metrics, contributor activity, and commentary.</p>
+                  <h3 style="color: #0078d4;">Quick Links</h3>
+                  <ul>
+                    <li><a href="https://your-org.github.io/ops-repo">Ops Dashboard</a></li>
+                    <li><a href="https://github.com/your-org/finmate-ai/releases">FinMate AI Releases</a></li>
+                  </ul>
+                  <p style="margin-top: 20px;">Regards,<br/><strong>FinMate AI Team</strong></p>
+                </div>
+              </body>
+            </html>
+          attachments: ./reports/investor-report-finmate.pdf
+
+  email-budget:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Budget Builder report
+        uses: actions/download-artifact@v4
+        with:
+          name: investor-report-budget
+          path: ./reports
+
+      - name: Send Budget Builder investor email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.INVESTOR_EMAIL_USER }}
+          password: ${{ secrets.INVESTOR_EMAIL_PASS }}
+          subject: "Budget Builder Lite Investor Report - $(date +'%Y-%m-%d')"
+          to: investors@your-org.com
+          from: 'Budget Builder Lite <reports@your-org.com>'
+          html_body: |
+            <html>
+              <body style="font-family: Arial, sans-serif; color: #333;">
+                <div style="max-width: 600px; margin: auto; border: 2px solid #36a64f; padding: 20px; border-radius: 8px;">
+                  <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="https://your-org.github.io/assets/budget-logo.png" alt="Budget Builder Lite Logo" width="120"/>
+                  </div>
+                  <h2 style="color: #36a64f;">Budget Builder Lite Weekly Investor Report</h2>
+                  <p>Hello Investors,</p>
+                  <p>Please find attached the latest Budget Builder Lite investor report. It includes performance metrics, contributor activity, and commentary.</p>
+                  <h3 style="color: #36a64f;">Quick Links</h3>
+                  <ul>
+                    <li><a href="https://your-org.github.io/ops-repo">Ops Dashboard</a></li>
+                    <li><a href="https://github.com/your-org/budget-builder-lite/releases">Budget Builder Lite Releases</a></li>
+                  </ul>
+                  <p style="margin-top: 20px;">Regards,<br/><strong>Budget Builder Lite Team</strong></p>
+                </div>
+              </body>
+            </html>
+          attachments: ./reports/investor-report-budget.pdf

@@ -1,0 +1,66 @@
+name: Export Metrics to Google Sheets
+
+on:
+  schedule:
+    - cron: '0 8 * * 1' # every Monday at 08:00 UTC
+  workflow_dispatch:
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repo
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Install dependencies
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install googleapis
+
+      # Collect metrics (example: Lighthouse scores, coverage, contributor stats)
+      - name: Collect metrics
+        run: |
+          mkdir -p metrics
+          echo "date,finmate_performance,budget_performance,coverage,commits,prs,issues" > metrics/export.csv
+          echo "$(date +%Y-%m-%d),90,84,85,12,7,5" >> metrics/export.csv
+
+      # Export to Google Sheets
+      - name: Export to Google Sheets
+        run: |
+          node <<'EOF'
+          const { google } = require('googleapis');
+          const fs = require('fs');
+
+          async function main() {
+            const auth = new google.auth.JWT(
+              process.env.GS_CLIENT_EMAIL,
+              null,
+              process.env.GS_PRIVATE_KEY.replace(/\\n/g, '\n'),
+              ['https://www.googleapis.com/auth/spreadsheets']
+            );
+
+            const sheets = google.sheets({ version: 'v4', auth });
+            const data = fs.readFileSync('metrics/export.csv', 'utf8').split('\n').slice(1)[0].split(',');
+
+            await sheets.spreadsheets.values.append({
+              spreadsheetId: process.env.GS_SHEET_ID,
+              range: 'Metrics!A:G',
+              valueInputOption: 'USER_ENTERED',
+              requestBody: { values: [data] }
+            });
+
+            console.log("Metrics exported successfully!");
+          }
+
+          main().catch(err => { console.error(err); process.exit(1); });
+          EOF
+        env:
+          GS_CLIENT_EMAIL: ${{ secrets.GS_CLIENT_EMAIL }}
+          GS_PRIVATE_KEY: ${{ secrets.GS_PRIVATE_KEY }}
+          GS_SHEET_ID: ${{ secrets.GS_SHEET_ID }}

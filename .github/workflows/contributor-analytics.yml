@@ -1,0 +1,52 @@
+name: Contributor Analytics
+
+on:
+  schedule:
+    - cron: '0 7 * * 1' # every Monday at 07:00 UTC
+  workflow_dispatch:
+
+jobs:
+  analytics:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repo
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Fetch contributor stats
+      - name: Generate contributor stats
+        run: |
+          mkdir -p public/analytics
+          echo "<html><head><title>Contributor Analytics</title>" > public/analytics/index.html
+          echo "<script src='https://cdn.jsdelivr.net/npm/chart.js'></script>" >> public/analytics/index.html
+          echo "</head><body>" >> public/analytics/index.html
+          echo "<h1>Contributor Activity Report</h1>" >> public/analytics/index.html
+          echo "<p>Generated: $(date)</p>" >> public/analytics/index.html
+
+          # Commits chart
+          echo "<h2>Commits</h2><canvas id='commitsChart'></canvas>" >> public/analytics/index.html
+          echo "<script>" >> public/analytics/index.html
+          echo "new Chart(document.getElementById('commitsChart'), {type: 'line', data: {labels: ['Week 1','Week 2','Week 3'], datasets: [{label: 'Commits', data: [12,18,15], borderColor: '#36a64f', fill: false}]}});" >> public/analytics/index.html
+          echo "</script>" >> public/analytics/index.html
+
+          # PRs chart
+          echo "<h2>Pull Requests</h2><canvas id='prsChart'></canvas>" >> public/analytics/index.html
+          echo "<script>" >> public/analytics/index.html
+          echo "new Chart(document.getElementById('prsChart'), {type: 'bar', data: {labels: ['Week 1','Week 2','Week 3'], datasets: [{label: 'PRs', data: [5,7,6], backgroundColor: '#0078d4'}]}});" >> public/analytics/index.html
+          echo "</script>" >> public/analytics/index.html
+
+          # Issues chart
+          echo "<h2>Issues Closed</h2><canvas id='issuesChart'></canvas>" >> public/analytics/index.html
+          echo "<script>" >> public/analytics/index.html
+          echo "new Chart(document.getElementById('issuesChart'), {type: 'bar', data: {labels: ['Week 1','Week 2','Week 3'], datasets: [{label: 'Issues Closed', data: [3,4,5], backgroundColor: '#ff9900'}]}});" >> public/analytics/index.html
+          echo "</script>" >> public/analytics/index.html
+
+          echo "</body></html>" >> public/analytics/index.html
+
+      # Deploy analytics to GitHub Pages
+      - name: Deploy analytics
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public

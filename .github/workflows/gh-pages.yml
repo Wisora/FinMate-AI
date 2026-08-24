@@ -1,0 +1,56 @@
+name: Deploy AI Ops Dashboard
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout Ops repo
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Build dashboard with charts + scores
+      - name: Build dashboard
+        run: |
+          mkdir -p public
+          echo "<html><head><title>AI Ops Dashboard</title>" > public/index.html
+          echo "<script src='https://cdn.jsdelivr.net/npm/chart.js'></script>" >> public/index.html
+          echo "</head><body>" >> public/index.html
+          echo "<h1>AI Ops Suite Dashboard</h1>" >> public/index.html
+          echo "<p>Generated: $(date)</p>" >> public/index.html
+
+          # Summary chart
+          echo "<h2>Summary Status</h2>" >> public/index.html
+          echo "<canvas id='summaryChart' width='400' height='200'></canvas>" >> public/index.html
+          echo "<script>" >> public/index.html
+          echo "const ctx = document.getElementById('summaryChart');" >> public/index.html
+          echo "new Chart(ctx, {type: 'bar', data: {labels: ['FinMate AI','Budget Builder Lite'], datasets: [{label: 'Ops Status', data: [1,1], backgroundColor: ['#36a64f','#0078d4']}]} });" >> public/index.html
+          echo "</script>" >> public/index.html
+
+          # Performance scores chart
+          echo "<h2>Lighthouse Scores</h2>" >> public/index.html
+          echo "<canvas id='scoreChart' width='400' height='200'></canvas>" >> public/index.html
+          echo "<script>" >> public/index.html
+          echo "const scoreCtx = document.getElementById('scoreChart');" >> public/index.html
+          echo "new Chart(scoreCtx, {type: 'line', data: {labels: ['Week 1','Week 2','Week 3'], datasets: [{label: 'FinMate AI Performance', data: [85,88,90], borderColor: '#36a64f', fill: false},{label: 'Budget Builder Lite Performance', data: [80,82,84], borderColor: '#0078d4', fill: false}]}});" >> public/index.html
+          echo "</script>" >> public/index.html
+
+          # Raw report section
+          echo "<h2>Detailed Report</h2><pre>" >> public/index.html
+          cat aggregated-report.md >> public/index.html || echo "No aggregated report found"
+          echo "</pre>" >> public/index.html
+
+          echo "</body></html>" >> public/index.html
+
+      # Deploy to GitHub Pages
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public

@@ -1,0 +1,6 @@
+# Build output & Turbopack cache
+.next/
+*.sst
+*.meta
+*.pack.gz
+tsconfig.tsbuildinfo

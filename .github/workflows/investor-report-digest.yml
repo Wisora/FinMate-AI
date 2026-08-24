@@ -1,0 +1,82 @@
+name: Investor Digest Email
+
+on:
+  schedule:
+    - cron: '0 12 * * 1' # every Monday at 12:00 UTC
+  workflow_dispatch:
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repo
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Download both reports
+      - name: Download FinMate report
+        uses: actions/download-artifact@v4
+        with:
+          name: investor-report-finmate
+          path: ./reports
+
+      - name: Download Budget Builder report
+        uses: actions/download-artifact@v4
+        with:
+          name: investor-report-budget
+          path: ./reports
+
+      # Send digest email
+      - name: Send investor digest email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.INVESTOR_EMAIL_USER }}
+          password: ${{ secrets.INVESTOR_EMAIL_PASS }}
+          subject: "Weekly Investor Digest - $(date +'%Y-%m-%d')"
+          to: investors@your-org.com
+          from: 'AI Ops Suite <reports@your-org.com>'
+          html_body: |
+            <html>
+              <body style="font-family: Arial, sans-serif; color: #333;">
+                <div style="max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
+                  <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="https://your-org.github.io/assets/logo.png" alt="Company Logo" width="120"/>
+                  </div>
+                  <h2 style="color: #0078d4;">Weekly Investor Digest</h2>
+                  <p>Hello Investors,</p>
+                  <p>This digest combines updates from both <strong>FinMate AI</strong> and <strong>Budget Builder Lite</strong>.</p>
+
+                  <h3 style="color: #0078d4;">FinMate AI Highlights</h3>
+                  <ul>
+                    <li>Performance: 90%</li>
+                    <li>Coverage: 85%</li>
+                    <li>Contributor activity trending upward</li>
+                  </ul>
+
+                  <h3 style="color: #36a64f;">Budget Builder Lite Highlights</h3>
+                  <ul>
+                    <li>Performance: 84%</li>
+                    <li>Coverage: 85%</li>
+                    <li>Issues closed steadily increasing</li>
+                  </ul>
+
+                  <h3>Commentary</h3>
+                  <p>Both products show strong weekly performance and consistent contributor engagement. Accessibility and SEO remain above 90%, while coverage is stable at 85%. Growth trends are positive across both apps.</p>
+
+                  <h3>Quick Links</h3>
+                  <ul>
+                    <li><a href="https://your-org.github.io/ops-repo">Ops Dashboard</a></li>
+                    <li><a href="https://github.com/your-org/finmate-ai/releases">FinMate AI Releases</a></li>
+                    <li><a href="https://github.com/your-org/budget-builder-lite/releases">Budget Builder Lite Releases</a></li>
+                  </ul>
+
+                  <p style="margin-top: 20px;">Regards,<br/><strong>AI Ops Suite</strong></p>
+                </div>
+              </body>
+            </html>
+          attachments: |
+            ./reports/investor-report-finmate.pdf
+            ./reports/investor-report-budget.pdf

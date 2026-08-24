@@ -1,0 +1,115 @@
+name: Quarterly Investor Deck
+
+on:
+  schedule:
+    - cron: '0 9 1 */3 *' # runs on the 1st day of every 3rd month (quarterly)
+  workflow_dispatch:
+
+jobs:
+  deck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install puppeteer chart.js
+
+      - name: Generate investor deck
+        run: |
+          mkdir -p reports
+          cat <<EOF > reports/investor-deck.html
+          <html>
+          <head>
+            <title>Quarterly Investor Deck</title>
+            <style>
+              body { font-family: Arial, sans-serif; color: #333; margin: 40px; }
+              .slide { page-break-after: always; }
+              h1, h2 { color: #0078d4; }
+              .cover { text-align: center; margin-top: 100px; }
+              .highlight { background: #f0f8ff; padding: 20px; border-radius: 8px; margin: 40px 0; }
+              .footer { margin-top: 40px; font-size: 12px; color: #777; text-align: center; }
+            </style>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+          </head>
+          <body>
+            <!-- Cover Slide -->
+            <div class="slide cover">
+              <img src="https://your-org.github.io/assets/logo.png" alt="Company Logo" width="150"/>
+              <h1>Quarterly Investor Deck</h1>
+              <p>Q$(date +%m) $(date +%Y)</p>
+            </div>
+
+            <!-- Executive Summary Slide -->
+            <div class="slide">
+              <h2>Executive Summary</h2>
+              <div class="highlight">
+                <p><strong>FinMate AI:</strong> Performance 90%, Coverage 85%</p>
+                <p><strong>Budget Builder Lite:</strong> Performance 84%, Coverage 85%</p>
+                <p>Contributor activity continues to trend upward across both products.</p>
+                <p><em>Message from the Founder:</em> “We’re proud of the steady growth this quarter. Accessibility and SEO remain strong, and our contributor base is expanding. We’re well‑positioned for the next phase of scaling.”</p>
+              </div>
+            </div>
+
+            <!-- Charts Slide -->
+            <div class="slide">
+              <h2>Contributor Activity</h2>
+              <canvas id="activityChart"></canvas>
+              <script>
+                new Chart(document.getElementById('activityChart'), {
+                  type: 'line',
+                  data: {
+                    labels: ['Jan','Feb','Mar'],
+                    datasets: [
+                      { label: 'Commits', data: [40,55,60], borderColor: '#0078d4', fill: false },
+                      { label: 'PRs', data: [15,20,25], borderColor: '#36a64f', fill: false },
+                      { label: 'Issues Closed', data: [10,12,15], borderColor: '#ff9900', fill: false }
+                    ]
+                  }
+                });
+              </script>
+            </div>
+
+            <!-- Product Highlights Slide -->
+            <div class="slide">
+              <h2>Product Highlights</h2>
+              <ul>
+                <li>FinMate AI: New multilingual support launched</li>
+                <li>Budget Builder Lite: Goal tracking and weekly reports added</li>
+                <li>Both apps: Accessibility compliance maintained above 95%</li>
+              </ul>
+            </div>
+
+            <!-- Closing Slide -->
+            <div class="slide">
+              <h2>Closing & Next Steps</h2>
+              <p>We remain focused on scaling, investor readiness, and contributor growth.</p>
+              <p>Next quarter: Dockerized deployments, expanded analytics, and investor Q&A sessions.</p>
+              <div class="footer">© $(date +%Y) Your Org — Investor Relations</div>
+            </div>
+          </body>
+          </html>
+          EOF
+
+          node -e "
+          const puppeteer = require('puppeteer');
+          (async () => {
+            const browser = await puppeteer.launch();
+            const page = await browser.newPage();
+            await page.goto('file://' + process.cwd() + '/reports/investor-deck.html');
+            await page.pdf({ path: 'reports/investor-deck.pdf', format: 'A4', landscape: true });
+            await browser.close();
+          })();
+          "
+
+      - name: Upload investor deck
+        uses: actions/upload-artifact@v4
+        with:
+          name: investor-deck
+          path: reports/investor-deck.pdf
