@@ -1,18 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { UserProfile } from '../../types';
 import { getFinancialSummary } from '../../services/reportsService';
 import {
   User,
   Mail,
-  Calendar,
   Crown,
   Sparkles,
-  ShieldCheck,
   Edit2,
   Check,
-  Wallet,
-  Activity,
   Award,
 } from 'lucide-react';
 
@@ -39,7 +35,26 @@ export const Profile: React.FC<ProfileProps> = ({
   const [email, setEmail] = useState(user.email);
   const [persona, setPersona] = useState(user.persona);
 
-  const summary = getFinancialSummary();
+  // Default state fallback while async data loads
+  const [summary, setSummary] = useState({
+    healthScore: 85,
+    netSavings: 1200,
+    savingsProgress: 65,
+  });
+
+  useEffect(() => {
+    async function loadSummary() {
+      try {
+        const data = await getFinancialSummary();
+        if (data) {
+          setSummary((prev) => ({ ...prev, ...data }));
+        }
+      } catch (err) {
+        console.error('Failed to load financial summary:', err);
+      }
+    }
+    loadSummary();
+  }, []);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -249,3 +264,5 @@ export const Profile: React.FC<ProfileProps> = ({
     </div>
   );
 };
+
+export default Profile;

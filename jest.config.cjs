@@ -1,27 +1,26 @@
 module.exports = {
-  // Transpile JS/TS files using Babel
+  preset: 'ts-jest',
   transform: {
-    "^.+\\.[tj]sx?$": "babel-jest",
+    '^.+\\.[tj]sx?$': 'ts-jest',
   },
 
-  // Setup DOM environment and extended matchers
-  testEnvironment: "jsdom",
-  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
 
-  // Supported extensions
-  moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json", "node"],
+  moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx', 'json', 'node'],
 
-  // Tell Jest where tests live
-  roots: ["<rootDir>/tests"],
+  roots: ['<rootDir>/tests'],
 
-  // Match test files
   testMatch: [
-    "**/__tests__/**/*.[jt]s?(x)",
-    "**/?(*.)+(spec|test).[jt]s?(x)",
+    '**/__tests__/**/*.[jt]s?(x)',
+    '**/?(*.)+(spec|test).[jt]s?(x)',
   ],
 
-  // Module path aliases (adjust if using paths like '@/' in tsconfig)
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/$1",
+    '^@/(.*)$': '<rootDir>/src/$1',
+    // Ignore CSS/Style imports during tests
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    // Mock image/asset imports
+    '\\.(jpg|jpeg|png|gif|webp|svg)$': '<rootDir>/tests/__mocks__/fileMock.js',
   },
 };

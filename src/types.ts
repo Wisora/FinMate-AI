@@ -1,3 +1,4 @@
+
 export type GoalCategory = 'savings' | 'debt' | 'investment';
 
 export interface Goal {
@@ -60,6 +61,7 @@ export interface ReportData {
 export type PlanType = 'free' | 'pro';
 
 export interface UserProfile {
+  id?: string;
   name: string;
   email: string;
   plan: PlanType;

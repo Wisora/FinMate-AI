@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import type { Transaction, Budget } from '@prisma/client';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -15,6 +14,22 @@ import {
 } from 'chart.js';
 import { useSession } from 'next-auth/react';
 
+// Fallback interfaces if @prisma/client is not generated
+export interface Transaction {
+  id: string | number;
+  amount: number;
+  createdAt: string | Date;
+  category?: { name: string };
+  user?: { email: string };
+}
+
+export interface Budget {
+  id: string | number;
+  limit: number;
+  period: string;
+  user?: { email: string };
+}
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -27,8 +42,8 @@ ChartJS.register(
   Legend
 );
 
-export default function Dashboard() {
-  const { data: session, status } = useSession();
+export function Dashboard() {
+  const { status } = useSession();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,12 +55,16 @@ export default function Dashboard() {
     async function fetchData() {
       try {
         const txRes = await fetch('/api/transactions');
-        const txData = await txRes.json();
-        setTransactions(txData);
+        if (txRes.ok) {
+          const txData = await txRes.json();
+          setTransactions(Array.isArray(txData) ? txData : []);
+        }
 
         const budgetRes = await fetch('/api/budgets');
-        const budgetData = await budgetRes.json();
-        setBudgets(budgetData);
+        if (budgetRes.ok) {
+          const budgetData = await budgetRes.json();
+          setBudgets(Array.isArray(budgetData) ? budgetData : []);
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -56,27 +75,18 @@ export default function Dashboard() {
   }, []);
 
   if (status === 'loading') return <p>Checking authentication...</p>;
-  if (!session) return <p>Please log in to view the dashboard.</p>;
-  if (session?.user?.role === 'admin') {
-  // ...
-
-    return <p>Access denied. Contact your admin.</p>;
   if (loading) return <p>Loading dashboard...</p>;
 
-  // Filtered transactions
   const filteredTransactions = transactions.filter((tx) => {
     const matchesSearch =
       search === '' ||
-      (tx as any).category?.name
-        ?.toLowerCase()
-        .includes(search.toLowerCase()) ||
-      (tx as any).user?.email?.toLowerCase().includes(search.toLowerCase());
+      tx.category?.name?.toLowerCase().includes(search.toLowerCase()) ||
+      tx.user?.email?.toLowerCase().includes(search.toLowerCase());
     const matchesCategory =
-      categoryFilter === '' || (tx as any).category?.name === categoryFilter;
+      categoryFilter === '' || tx.category?.name === categoryFilter;
     return matchesSearch && matchesCategory;
   });
 
-  // Chart data
   const income = transactions
     .filter((tx) => tx.amount > 0)
     .reduce((sum, tx) => sum + tx.amount, 0);
@@ -98,7 +108,7 @@ export default function Dashboard() {
 
   const categoryData = transactions.reduce(
     (acc, tx) => {
-      const category = (tx as any).category?.name || 'Uncategorized';
+      const category = tx.category?.name || 'Uncategorized';
       acc[category] = (acc[category] || 0) + Math.abs(tx.amount);
       return acc;
     },
@@ -210,9 +220,9 @@ export default function Dashboard() {
                 <td className="border px-4 py-2">{tx.id}</td>
                 <td className="border px-4 py-2">{tx.amount}</td>
                 <td className="border px-4 py-2">
-                  {(tx as any).category?.name || 'Uncategorized'}
+                  {tx.category?.name || 'Uncategorized'}
                 </td>
-                <td className="border px-4 py-2">{(tx as any).user?.email}</td>
+                <td className="border px-4 py-2">{tx.user?.email}</td>
                 <td className="border px-4 py-2">
                   {new Date(tx.createdAt).toLocaleDateString()}
                 </td>
@@ -227,7 +237,7 @@ export default function Dashboard() {
         <ul className="space-y-2">
           {budgets.map((b) => (
             <li key={b.id} className="p-2 border rounded dark:border-gray-600">
-              {b.period} budget: {b.limit} (User: {(b as any).user?.email})
+              {b.period} budget: {b.limit} (User: {b.user?.email})
               <progress
                 value={expenses}
                 max={b.limit}
@@ -255,3 +265,5 @@ export default function Dashboard() {
     </div>
   );
 }
+
+export default Dashboard;

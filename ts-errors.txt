@@ -1,1 +1,0 @@
-src/pages/Dashboard.tsx(60,26): error TS1005: ')' expected.

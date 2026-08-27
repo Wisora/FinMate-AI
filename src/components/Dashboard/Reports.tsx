@@ -6,8 +6,6 @@ import {
   getCategoryBreakdown,
   fetchAISummaryReport,
 } from '../../services/reportsService';
-import { Spinner } from '../common/Spinner';
-import { PromoBanner } from '../common/PromoBanner';
 import {
   PieChart as PieChartIcon,
   BarChart3,
@@ -17,10 +15,8 @@ import {
   Sparkles,
   Lock,
   Calendar,
-  DollarSign,
   FileSpreadsheet,
   FileText,
-  CheckCircle2,
 } from 'lucide-react';
 
 interface ReportsProps {
@@ -40,15 +36,42 @@ export const Reports: React.FC<ReportsProps> = ({
   const { formatCurrency, t, language, currency } = useLanguage();
 
   const [timeframe, setTimeframe] = useState('July 2026');
-  const [summary, setSummary] = useState(getFinancialSummary());
-  const [categories, setCategories] = useState(getCategoryBreakdown());
+  
+  // Safe default state while async data fetches
+  const [summary, setSummary] = useState({
+    income: 6000,
+    expenses: 3500,
+    netSavings: 2500,
+    healthScore: 85,
+    savingsProgress: 70,
+  });
+
+  const [categories, setCategories] = useState<
+    Array<{ category: string; amount: number; percentage: number; color: string }>
+  >([
+    { category: 'Housing', amount: 1500, percentage: 42, color: '#3b82f6' },
+    { category: 'Food & Dining', amount: 800, percentage: 23, color: '#10b981' },
+    { category: 'Transportation', amount: 400, percentage: 11, color: '#f59e0b' },
+    { category: 'Entertainment', amount: 300, percentage: 9, color: '#8b5cf6' },
+    { category: 'Utilities', amount: 500, percentage: 15, color: '#ec4899' },
+  ]);
 
   const [aiReportText, setAiReportText] = useState<string | null>(null);
   const [generatingAI, setGeneratingAI] = useState(false);
 
   useEffect(() => {
-    setSummary(getFinancialSummary());
-    setCategories(getCategoryBreakdown());
+    async function loadData() {
+      try {
+        const sumData = await getFinancialSummary();
+        if (sumData) setSummary((prev) => ({ ...prev, ...sumData }));
+
+        const catData = await getCategoryBreakdown();
+        if (Array.isArray(catData)) setCategories(catData);
+      } catch (err) {
+        console.error('Failed to load report data:', err);
+      }
+    }
+    loadData();
   }, [timeframe]);
 
   const handleGenerateAIReport = async () => {
@@ -69,7 +92,7 @@ export const Reports: React.FC<ReportsProps> = ({
 
   const handleExport = (type: 'pdf' | 'csv') => {
     if (user.plan === 'free') {
-      showToast(t('upgradePrompt'), 'warning');
+      showToast(t('upgradePrompt') || 'Please upgrade to access export features', 'warning');
       onNavigate('upgrade');
       return;
     }
@@ -92,13 +115,11 @@ export const Reports: React.FC<ReportsProps> = ({
       document.body.removeChild(link);
       showToast('CSV Report exported successfully!', 'success');
     } else {
-      // Simulate PDF print trigger
       window.print();
       showToast('Preparing PDF print preview...', 'info');
     }
   };
 
-  // Sample historical monthly data for bar chart visualization
   const monthlyData = [
     { month: 'Mar', income: 5100, expenses: 3800 },
     { month: 'Apr', income: 5200, expenses: 3600 },
@@ -112,12 +133,6 @@ export const Reports: React.FC<ReportsProps> = ({
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12">
-      {/* Top Banner */}
-      <PromoBanner
-        onUpgradeClick={() => onNavigate('upgrade')}
-        userPlan={user.plan}
-      />
-
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -152,7 +167,7 @@ export const Reports: React.FC<ReportsProps> = ({
             className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 shadow-sm transition-colors"
           >
             <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span>{t('exportCSV')}</span>
+            <span>{t('exportCSV') || 'Export CSV'}</span>
             {user.plan === 'free' && (
               <Lock className="w-3 h-3 text-amber-500 ml-0.5" />
             )}
@@ -163,7 +178,7 @@ export const Reports: React.FC<ReportsProps> = ({
             className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-colors"
           >
             <Download className="w-4 h-4" />
-            <span>{t('exportPDF')}</span>
+            <span>{t('exportPDF') || 'Export PDF'}</span>
             {user.plan === 'free' && (
               <Lock className="w-3 h-3 text-amber-300 ml-0.5" />
             )}
@@ -238,13 +253,11 @@ export const Reports: React.FC<ReportsProps> = ({
                   className="flex-1 flex flex-col items-center gap-2 h-full justify-end group"
                 >
                   <div className="w-full flex items-end justify-center gap-1.5 h-full">
-                    {/* Income Bar */}
                     <div
                       title={`Income: ${formatCurrency(d.income)}`}
                       className="w-1/2 bg-emerald-500 dark:bg-emerald-400 rounded-t-lg transition-all duration-500 hover:brightness-110"
                       style={{ height: `${incomeHeight}%` }}
                     />
-                    {/* Expense Bar */}
                     <div
                       title={`Expenses: ${formatCurrency(d.expenses)}`}
                       className="w-1/2 bg-rose-500 dark:bg-rose-400 rounded-t-lg transition-all duration-500 hover:brightness-110"
@@ -314,13 +327,13 @@ export const Reports: React.FC<ReportsProps> = ({
         </div>
       </div>
 
-      {/* AI Synthesis & Summary Report Generator */}
+      {/* AI Synthesis Section */}
       <section className="p-8 rounded-3xl bg-slate-900 text-white shadow-xl space-y-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold mb-2">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>POWERED BY GEMINI 3.6 FLASH</span>
+              <span>POWERED BY AI</span>
             </div>
             <h2 className="text-2xl font-black">
               AI Financial Analysis Synthesis
@@ -336,20 +349,15 @@ export const Reports: React.FC<ReportsProps> = ({
             disabled={generatingAI}
             className="px-6 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white font-extrabold text-xs shadow-lg shadow-emerald-500/25 flex items-center gap-2 transition-all duration-200 shrink-0"
           >
-            {generatingAI ? (
-              <Spinner size="sm" label="Generating..." />
-            ) : (
-              <Sparkles className="w-4 h-4" />
-            )}
+            <Sparkles className="w-4 h-4" />
             <span>
               {generatingAI
                 ? 'Analyzing Financial Data...'
-                : t('generateReport')}
+                : t('generateReport') || 'Generate Report'}
             </span>
           </button>
         </div>
 
-        {/* Generated Report Content Area */}
         {aiReportText ? (
           <div className="p-6 rounded-2xl bg-slate-800/90 border border-slate-700 text-sm leading-relaxed text-slate-100 whitespace-pre-line font-sans space-y-4">
             {aiReportText}
@@ -361,8 +369,7 @@ export const Reports: React.FC<ReportsProps> = ({
               No AI synthesis report generated yet for {timeframe}.
             </p>
             <p className="text-xs text-slate-400">
-              Click {t('generateReport')} above to synthesize your financial
-              metrics.
+              Click {t('generateReport') || 'Generate Report'} above to synthesize your financial metrics.
             </p>
           </div>
         )}
@@ -370,3 +377,5 @@ export const Reports: React.FC<ReportsProps> = ({
     </div>
   );
 };
+
+export default Reports;

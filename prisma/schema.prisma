@@ -3,50 +3,81 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum GoalCategory {
+  savings
+  debt
+  investment
+}
+
+enum Priority {
+  high
+  medium
+  low
+}
+
+enum PlanType {
+  free
+  pro
 }
 
 model User {
-  id             Int             @id @default(autoincrement())
-  email          String          @unique
-  name           String?
-  role           String?
-  image          String?
-  goals          Goal[]
-  reports        Report[]
-  subscriptions  Subscription[]
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  id                    String         @id @default(cuid())
+  email                 String         @unique
+  name                  String?
+  role                  String?        @default("user")
+  image                 String?
+  persona               String?
+  monthlyIncome         Float          @default(0)
+  monthlyExpensesBudget Float          @default(0)
+  plan                  PlanType       @default(free)
+  goals                 Goal[]
+  reports               Report[]
+  subscriptions         Subscription[]
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
 }
 
 model Goal {
-  id            Int      @id @default(autoincrement())
+  id            String       @id @default(cuid())
   title         String
-  targetAmount  Int
-  currentAmount Int       @default(0)
-  userId        Int
-  user          User     @relation(fields: [userId], references: [id])
+  category      GoalCategory @default(savings)
+  targetAmount  Float
+  currentAmount Float        @default(0)
+  targetDate    DateTime?
+  priority      Priority     @default(medium)
+  isCompleted   Boolean      @default(false)
+  notes         String?
+  userId        String
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model Report {
+  id            String   @id @default(cuid())
+  timeframe     String   // e.g. "July 2026"
+  totalIncome   Float
+  totalExpenses Float
+  netSavings    Float
+  aiSummary     String?
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
 
-model Report {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model Subscription {
-  id        Int      @id @default(autoincrement())
-  plan      String
-  status    String
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(cuid())
+  plan          PlanType @default(free)
+  status        String   // "ACTIVE", "CANCELLED", etc.
+  payfastToken  String?
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
