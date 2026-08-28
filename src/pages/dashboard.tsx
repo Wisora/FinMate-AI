@@ -1,49 +1,61 @@
-// src/pages/dashboard.tsx
-import { AssistantChat } from '@/components/Dashboard/AssistantChat';
-import { GoalCard } from '@/components/Dashboard/GoalCard';
-import { RecommendationCard } from '@/components/Dashboard/RecommendationCard';
-import { ReportCard } from '@/components/Dashboard/ReportCard';
-import Subscriptions from '@/components/Dashboard/Subscriptions';
-import Dashboard from '@/components/Dashboard/Dashboard';
+import React from 'react';
+import { GoalCategory } from '@prisma/client';
 
-export default function DashboardPage() {
-  const mockGoal = {
-    id: '1',
-    title: 'Emergency Savings',
-    targetAmount: 5000,
-    currentAmount: 1500,
-    category: 'Savings',
-  };
+// Local Mock Data with strict Prisma enum casting
+const mockGoal = {
+  id: '1',
+  title: 'Emergency Fund',
+  targetAmount: 10000,
+  currentAmount: 2500,
+  category: 'savings' as GoalCategory,
+  targetDate: '2026-12-31',
+  priority: 'high',
+  isCompleted: false,
+};
 
-  const mockRecommendation = {
-    id: '1',
-    title: 'Cut Down Dining Out',
-    description: 'Reduce weekly restaurant spending by 20%.',
-    impact: 'High',
-  };
+const mockReport = {
+  timeframe: 'August 2026',
+  income: 5000,
+  expenses: 3000,
+  netSavings: 2000,
+  reportDate: '2026-08-28',
+};
 
+const mockRecommendation = {
+  id: '1',
+  title: 'Reduce Dining Out',
+  description: 'You spent 15% more on food this month.',
+  impact: 'High',
+  category: 'expenses' as any,
+  potentialSavings: 150,
+  actionText: 'Set Budget',
+  applied: false,
+};
+
+export default function Dashboard() {
   return (
-    <main style={{ padding: '20px' }}>
-      <Dashboard />
-      <GoalCard 
-        goal={mockGoal} 
-        onEdit={() => {}} 
-        onAddProgress={() => {}} 
-      />
-      <ReportCard 
-        timeframe="Weekly" 
-        income={2000} 
-        expenses={1200} 
-        netSavings={800} 
-        topExpenseCategory="Food"
-        reportDate="2026-08-26"
-      />
-      <RecommendationCard 
-        recommendation={mockRecommendation} 
-        onApply={() => {}} 
-      />
-      <AssistantChat />
-      <Subscriptions />
-    </main>
+    <div className="p-8 max-w-7xl mx-auto space-y-6">
+      <h1 className="text-3xl font-bold tracking-tight">FinMate AI Dashboard</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="p-4 border rounded-lg shadow-sm bg-card">
+          <h2 className="font-semibold text-lg mb-2">Primary Goal</h2>
+          <p className="text-sm font-medium">{mockGoal.title}</p>
+          <p className="text-2xl font-bold">${mockGoal.currentAmount} / ${mockGoal.targetAmount}</p>
+        </div>
+
+        <div className="p-4 border rounded-lg shadow-sm bg-card">
+          <h2 className="font-semibold text-lg mb-2">Monthly Summary</h2>
+          <p className="text-sm font-medium">{mockReport.timeframe}</p>
+          <p className="text-2xl font-bold text-green-600">+${mockReport.netSavings}</p>
+        </div>
+
+        <div className="p-4 border rounded-lg shadow-sm bg-card">
+          <h2 className="font-semibold text-lg mb-2">Top Recommendation</h2>
+          <p className="text-sm font-medium">{mockRecommendation.title}</p>
+          <p className="text-xs text-muted-foreground">{mockRecommendation.description}</p>
+        </div>
+      </div>
+    </div>
   );
 }

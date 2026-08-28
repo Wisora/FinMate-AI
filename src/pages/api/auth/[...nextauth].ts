@@ -1,32 +1,23 @@
-import NextAuth from 'next-auth';
-import GoogleProvider from 'next-auth/providers/google';
-import CredentialsProvider from 'next-auth/providers/credentials';
+import NextAuth, { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
 
-export default NextAuth({
+export const authOptions: NextAuthOptions = {
   providers: [
-    // Example: Google login
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
-    // Example: Email/password login
     CredentialsProvider({
-      name: 'Credentials',
+      name: "Credentials",
       credentials: {
-        email: { label: 'Email', type: 'text' },
-        password: { label: 'Password', type: 'password' },
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        // Replace with your own user lookup
-        if (
-          credentials?.email === 'admin@example.com' &&
-          credentials?.password === 'password123'
-        ) {
+        // Replace with your actual database user lookup logic
+        if (credentials?.email === "alex.mercer@finmate.ai") {
           return {
-            id: '1',
-            name: 'Admin User',
-            email: 'admin@example.com',
-            role: 'admin',
+            id: "1",
+            name: "Alex Mercer",
+            email: "alex.mercer@finmate.ai",
+            role: "user",
+            plan: "free",
           };
         }
         return null;
@@ -34,14 +25,26 @@ export default NextAuth({
     }),
   ],
   callbacks: {
-    async session({ session, token }) {
-      // Attach role to session
-      session.user.role = (token as any).role || 'user';
-      return session;
-    },
     async jwt({ token, user }) {
-      if (user) token.role = (user as any).role;
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+        token.plan = user.plan;
+      }
       return token;
     },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
+        session.user.plan = token.plan as string;
+      }
+      return session;
+    },
   },
-});
+  session: {
+    strategy: "jwt",
+  },
+};
+
+export default NextAuth(authOptions);

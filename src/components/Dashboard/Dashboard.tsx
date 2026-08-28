@@ -14,7 +14,7 @@ import {
 } from 'chart.js';
 import { useSession } from 'next-auth/react';
 
-// Fallback interfaces if @prisma/client is not generated
+// Interfaces for component state
 export interface Transaction {
   id: string | number;
   amount: number;
@@ -42,7 +42,7 @@ ChartJS.register(
   Legend
 );
 
-export function Dashboard() {
+export default function Dashboard() {
   const { status } = useSession();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [budgets, setBudgets] = useState<Budget[]>([]);
@@ -54,19 +54,22 @@ export function Dashboard() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const txRes = await fetch('/api/transactions');
+        const [txRes, budgetRes] = await Promise.all([
+          fetch('/api/transactions'),
+          fetch('/api/budgets'),
+        ]);
+
         if (txRes.ok) {
           const txData = await txRes.json();
           setTransactions(Array.isArray(txData) ? txData : []);
         }
 
-        const budgetRes = await fetch('/api/budgets');
         if (budgetRes.ok) {
           const budgetData = await budgetRes.json();
           setBudgets(Array.isArray(budgetData) ? budgetData : []);
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching dashboard data:', error);
       } finally {
         setLoading(false);
       }
@@ -74,8 +77,9 @@ export function Dashboard() {
     fetchData();
   }, []);
 
-  if (status === 'loading') return <p>Checking authentication...</p>;
-  if (loading) return <p>Loading dashboard...</p>;
+  if (status === 'loading' || loading) {
+    return <div className="p-6 text-center">Loading dashboard...</div>;
+  }
 
   const filteredTransactions = transactions.filter((tx) => {
     const matchesSearch =
@@ -97,10 +101,11 @@ export function Dashboard() {
 
   const monthlyData = transactions.reduce(
     (acc, tx) => {
-      const month = new Date(tx.createdAt).toLocaleString('default', {
-        month: 'short',
-      });
-      acc[month] = (acc[month] || 0) + tx.amount;
+      const date = new Date(tx.createdAt);
+      if (!isNaN(date.getTime())) {
+        const month = date.toLocaleString('default', { month: 'short' });
+        acc[month] = (acc[month] || 0) + tx.amount;
+      }
       return acc;
     },
     {} as Record<string, number>
@@ -155,6 +160,11 @@ export function Dashboard() {
     ],
   };
 
+  const formatDate = (dateInput: string | Date) => {
+    const d = new Date(dateInput);
+    return isNaN(d.getTime()) ? 'N/A' : d.toLocaleDateString();
+  };
+
   return (
     <div
       className={
@@ -182,12 +192,12 @@ export function Dashboard() {
             placeholder="Search by category or user"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="px-3 py-2 border rounded w-1/3 dark:bg-gray-800"
+            className="px-3 py-2 border rounded w-1/3 dark:bg-gray-800 dark:text-white"
           />
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-3 py-2 border rounded dark:bg-gray-800"
+            className="px-3 py-2 border rounded dark:bg-gray-800 dark:text-white"
           >
             <option value="">All Categories</option>
             {Object.keys(categoryData).map((cat) => (
@@ -199,7 +209,7 @@ export function Dashboard() {
         </div>
       </section>
 
-      <section className="mb-6">
+      <section className="mb-6 overflow-x-auto">
         <h3 className="text-lg font-semibold mb-2">Transactions</h3>
         <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-600">
           <thead className="bg-gray-100 dark:bg-gray-800">
@@ -212,58 +222,76 @@ export function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            {filteredTransactions.map((tx) => (
-              <tr
-                key={tx.id}
-                className="hover:bg-gray-50 dark:hover:bg-gray-700"
-              >
-                <td className="border px-4 py-2">{tx.id}</td>
-                <td className="border px-4 py-2">{tx.amount}</td>
-                <td className="border px-4 py-2">
-                  {tx.category?.name || 'Uncategorized'}
-                </td>
-                <td className="border px-4 py-2">{tx.user?.email}</td>
-                <td className="border px-4 py-2">
-                  {new Date(tx.createdAt).toLocaleDateString()}
+            {filteredTransactions.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="border px-4 py-2 text-center">
+                  No transactions found.
                 </td>
               </tr>
-            ))}
+            ) : (
+              filteredTransactions.map((tx) => (
+                <tr
+                  key={tx.id}
+                  className="hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  <td className="border px-4 py-2">{tx.id}</td>
+                  <td className="border px-4 py-2">{tx.amount}</td>
+                  <td className="border px-4 py-2">
+                    {tx.category?.name || 'Uncategorized'}
+                  </td>
+                  <td className="border px-4 py-2">{tx.user?.email || 'N/A'}</td>
+                  <td className="border px-4 py-2">{formatDate(tx.createdAt)}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </section>
 
       <section className="mb-6">
         <h3 className="text-lg font-semibold mb-2">Budgets</h3>
-        <ul className="space-y-2">
-          {budgets.map((b) => (
-            <li key={b.id} className="p-2 border rounded dark:border-gray-600">
-              {b.period} budget: {b.limit} (User: {b.user?.email})
-              <progress
-                value={expenses}
-                max={b.limit}
-                className="w-full h-2"
-              ></progress>
-            </li>
-          ))}
-        </ul>
+        {budgets.length === 0 ? (
+          <p className="text-sm text-gray-500">No active budgets.</p>
+        ) : (
+          <ul className="space-y-2">
+            {budgets.map((b) => (
+              <li
+                key={b.id}
+                className="p-3 border rounded dark:border-gray-600 dark:bg-gray-800"
+              >
+                <div className="flex justify-between mb-1">
+                  <span>
+                    {b.period} budget: {b.limit}
+                  </span>
+                  <span>User: {b.user?.email || 'N/A'}</span>
+                </div>
+                <progress
+                  value={expenses}
+                  max={b.limit}
+                  className="w-full h-2"
+                ></progress>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
-      <section className="mb-6">
-        <h3 className="text-lg font-semibold mb-2">Income vs Expenses</h3>
-        <Bar data={barData} />
-      </section>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <section>
+          <h3 className="text-lg font-semibold mb-2">Income vs Expenses</h3>
+          <Bar data={barData} />
+        </section>
 
-      <section className="mb-6">
-        <h3 className="text-lg font-semibold mb-2">Monthly Trend</h3>
-        <Line data={lineData} />
-      </section>
+        <section>
+          <h3 className="text-lg font-semibold mb-2">Monthly Trend</h3>
+          <Line data={lineData} />
+        </section>
 
-      <section>
-        <h3 className="text-lg font-semibold mb-2">Category Breakdown</h3>
-        <Pie data={pieData} />
-      </section>
+        <section>
+          <h3 className="text-lg font-semibold mb-2">Category Breakdown</h3>
+          <Pie data={pieData} />
+        </section>
+      </div>
     </div>
   );
 }
-
-export default Dashboard;

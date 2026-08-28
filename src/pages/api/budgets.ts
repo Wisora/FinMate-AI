@@ -1,29 +1,37 @@
-import { PrismaClient, Budget } from '@prisma/client';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Budget[] | Budget | { message: string }>
+  res: NextApiResponse
 ) {
-  try {
-    if (req.method === 'GET') {
-      const budgets = await prisma.budget.findMany({ include: { user: true } });
-      return res.status(200).json(budgets);
+  if (req.method === 'GET') {
+    try {
+      const goals = await prisma.goal.findMany();
+      return res.status(200).json(goals);
+    } catch (error) {
+      return res.status(500).json({ error: 'Failed to fetch goals' });
     }
-
-    if (req.method === 'POST') {
-      const { userId, limit, period } = req.body;
-      const budget = await prisma.budget.create({
-        data: { userId, limit, period },
-      });
-      return res.status(201).json(budget);
-    }
-
-    return res.status(405).json({ message: 'Method not allowed' });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Internal server error' });
   }
+
+  if (req.method === 'POST') {
+    try {
+      const { title, targetAmount, userId, category } = req.body;
+      const newGoal = await prisma.goal.create({
+        data: {
+          title,
+          targetAmount: parseFloat(targetAmount),
+          category: category || 'savings',
+          userId,
+        },
+      });
+      return res.status(201).json(newGoal);
+    } catch (error) {
+      return res.status(500).json({ error: 'Failed to create goal' });
+    }
+  }
+
+  return res.status(405).json({ message: 'Method not allowed' });
 }
