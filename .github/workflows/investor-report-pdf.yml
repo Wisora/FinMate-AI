@@ -83,7 +83,7 @@ jobs:
           "
 
       - name: Upload FinMate report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: investor-report-finmate
           path: reports/investor-report-finmate.pdf
