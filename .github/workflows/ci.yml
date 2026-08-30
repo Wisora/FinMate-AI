@@ -23,6 +23,9 @@ jobs:
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      VITE_PAYFAST_MERCHANT_ID: ${{ secrets.VITE_PAYFAST_MERCHANT_ID }}
+      VITE_PAYFAST_MERCHANT_KEY: ${{ secrets.VITE_PAYFAST_MERCHANT_KEY }}
+      VITE_PAYFAST_PASSPHRASE: ${{ secrets.VITE_PAYFAST_PASSPHRASE }}
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
