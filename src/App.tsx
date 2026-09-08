@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 
 // Shared Interfaces
 export interface UserProfile {
@@ -35,8 +36,9 @@ type GenericComponentProps = {
 // Component Stubs (Replace with your actual component imports as needed)
 const LanguageProvider = ({ children }: GenericComponentProps) => <>{children}</>;
 const Navbar = (props: GenericComponentProps) => (
-  <nav className="p-4 bg-slate-800 text-white flex gap-4">
+  <nav className="p-4 bg-slate-800 text-white flex gap-4 items-center justify-between">
     <span className="font-bold">FinMate AI</span>
+    {props.user && <span className="text-xs text-slate-300">Signed in as {props.user.name}</span>}
   </nav>
 );
 const Dashboard = (props: GenericComponentProps) => <div className="p-4">Dashboard View</div>;
@@ -60,6 +62,7 @@ const DEFAULT_USER: UserProfile = {
 };
 
 export default function App() {
+  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState<string>('dashboard');
 
   const [user, setUser] = useState<UserProfile>(() => {
@@ -71,6 +74,18 @@ export default function App() {
     }
     return DEFAULT_USER;
   });
+
+  // Sync NextAuth session to user state when session updates
+  useEffect(() => {
+    if (session?.user) {
+      setUser((prev) => ({
+        ...prev,
+        name: session.user?.name || prev.name,
+        email: session.user?.email || prev.email,
+        avatarUrl: session.user?.image || prev.avatarUrl,
+      }));
+    }
+  }, [session]);
 
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
