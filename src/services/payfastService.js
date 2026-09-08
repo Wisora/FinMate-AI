@@ -138,7 +138,9 @@ export function payfastConfigured() {
 }
 
 // PHP-style urlencode (PayFast signature rule): space → '+'.
-const encode = (v) => encodeURIComponent(String(v)).replace(/%20/g, "+");
+// Export so the server-side webhook signature check reuses the same rule
+// (PayFast signs with PHP's urlencode, not JS encodeURIComponent).
+export const encode = (v) => encodeURIComponent(String(v)).replace(/%20/g, "+");
 
 // Build the POST fields incl. the md5 signature. Fields are sorted
 // alphabetically and the passphrase appended as &passphrase=... (PayFast spec).

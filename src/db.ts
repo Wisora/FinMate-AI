@@ -1,29 +1,73 @@
-import { neon } from "@neondatabase/serverless";
+import pg from "pg";
 
 /**
- * Server-only handle to the team's database (Neon serverless Postgres over HTTP).
- * The connection string comes from `DATABASE_URL`, which the owner connects via
- * the database card and which is injected into the sandbox and passed to the live
- * host on publish. Resolved lazily (per call, not at module load) so the site
- * still builds and serves before a database is connected — the error only
- * surfaces if a query actually runs without `DATABASE_URL`.
+ * Server-only connection layer to the team Postgres database over TCP.
  *
- * Use it only inside a `createServerFn()` handler or an `src/routes/api/*` route
- * (never client code):
+ * Switched away from @neondatabase/serverless (Neon's HTTP protocol) because the
+ * team DB is Railway Postgres — a standard Postgres server speaking the wire
+ * protocol — and the webhook must reach it from Vercel (a serverless function)
+ * and from local Bun. `pg` (node-postgres) is a light, pure-JS TCP driver that
+ * works in both.
  *
- *   const getPosts = createServerFn().handler(async () => {
- *     const rows = await sql()`select id, title, created_at from posts`;
- *     // Coerce non-primitive columns (timestamps are JS Dates) to strings before
- *     // returning to the client, or React will refuse to render them:
- *     return rows.map((r) => ({ ...r, created_at: String(r.created_at) }));
- *   });
+ * The connection string comes from `DATABASE_URL` (injected into the sandbox and
+ * passed to Vercel by go-live.sh / the deploy job env). The pool is resolved
+ * lazily and cached so the site still builds/serves before a database is
+ * connected — the error only surfaces if a query actually runs without
+ * `DATABASE_URL`.
+ *
+ * Use it only inside an `src/routes/api/*` route's `server.handlers` (never client
+ * code):
+ *
+ *   import { getDb } from "~/db";
+ *   const db = getDb();
+ *   const { rows } = await db.query("select 1 as ok");
  */
-export const sql = () => {
+
+const { Pool } = pg;
+
+let sharedPool: pg.Pool | null = null;
+
+/** Best-effort SSL decision based on the connection string. */
+function resolveSsl(url: string) {
+  const match = /(?:[?&])sslmode=([^&]+)/.exec(url);
+  if (match && match[1] === "disable") return false;
+  // Railway/Vercel public Postgres connections are TLS-terminated; some
+  // providers use self-signed certs, so accept them rather than failing.
+  return { rejectUnauthorized: false };
+}
+
+export interface Db {
+  query: (text: string, values?: unknown[]) => Promise<{ rows: any[] }>;
+}
+
+export function getPool(): pg.Pool {
+  if (sharedPool) return sharedPool;
   const url = process.env.DATABASE_URL;
   if (!url) {
     throw new Error(
-      "DATABASE_URL is not set — connect a database (via the database card) before running queries.",
+      "DATABASE_URL is not set — connect the Railway Postgres database and inject DATABASE_URL before running queries.",
     );
   }
-  return neon(url);
-};
+  sharedPool = new Pool({
+    connectionString: url,
+    ssl: resolveSsl(url),
+    // Keep the pool tiny: Vercel serverless functions are short-lived and each
+    // connection is precious. per-function concurrency is low.
+    max: 2,
+    idleTimeoutMillis: 30_000,
+    connectionTimeoutMillis: 10_000,
+  });
+  // A pool error (e.g. the DB dropped a socket) should not crash the function;
+  // log it instead. Pool errors are per-idle-client and the pool recovers.
+  sharedPool.on("error", (err) => {
+    console.error("[db] idle client error", err);
+  });
+  return sharedPool;
+}
+
+export function getDb(): Db {
+  const pool = getPool();
+  return {
+    query: (text: string, values?: unknown[]) => pool.query(text, values),
+  };
+}
