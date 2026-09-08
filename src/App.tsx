@@ -66,11 +66,13 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
 
   const [user, setUser] = useState<UserProfile>(() => {
-    try {
-      const saved = localStorage.getItem('finmate_user_profile');
-      if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.warn('Failed to load user profile', e);
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('finmate_user_profile');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {
+        console.warn('Failed to load user profile', e);
+      }
     }
     return DEFAULT_USER;
   });
@@ -104,10 +106,12 @@ export default function App() {
   const handleUpdateProfile = (updates: Partial<UserProfile>) => {
     setUser((prev) => {
       const updated = { ...prev, ...updates };
-      try {
-        localStorage.setItem('finmate_user_profile', JSON.stringify(updated));
-      } catch (e) {
-        console.warn('Failed to save user profile', e);
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('finmate_user_profile', JSON.stringify(updated));
+        } catch (e) {
+          console.warn('Failed to save user profile', e);
+        }
       }
       return updated;
     });

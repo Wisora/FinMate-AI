@@ -2,23 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Base Reset Overrides */
-@layer base {
-  body {
-    @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased font-sans transition-colors duration-200;
-  }
+/* Reset root and body layout to span full browser width */
+html,
+body {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
-/* Custom Scrollbar for Chat & Modals */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 dark:bg-slate-700 rounded-full;
+/* Ensure Next.js root element expands fully */
+#__next,
+main {
+  width: 100%;
+  min-height: 100vh;
 }
