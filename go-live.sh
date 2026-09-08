@@ -44,6 +44,11 @@ SCOPE_ARGS=()
 if [ -n "${VERCEL_SCOPE:-}" ]; then SCOPE_ARGS=(--scope "$VERCEL_SCOPE"); fi
 ENV_ARGS=()
 if [ -n "${DATABASE_URL:-}" ]; then ENV_ARGS=(-e "DATABASE_URL=$DATABASE_URL"); fi
+# PayFast secrets are needed at RUNTIME too (the /api/payfast-notify webhook
+# verifies the ITN signature server-side), so forward them like DATABASE_URL.
+for PF_VAR in VITE_PAYFAST_MERCHANT_ID VITE_PAYFAST_MERCHANT_KEY VITE_PAYFAST_PASSPHRASE; do
+  if [ -n "${!PF_VAR:-}" ]; then ENV_ARGS+=(-e "$PF_VAR=${!PF_VAR}"); fi
+done
 
 echo "==> deploying${VERCEL_SCOPE:+ (scope: $VERCEL_SCOPE)}"
 DEPLOY_OUT="$($VERCEL deploy --prebuilt --prod --yes --token "$VERCEL_TOKEN" \
