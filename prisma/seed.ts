@@ -1,14 +1,17 @@
-import { PrismaClient, GoalCategory, Priority, PlanType } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Starting database seed...');
 
-  // 1. Clean existing records
+  // 1. Clean existing records in dependency order
   await prisma.subscription.deleteMany();
   await prisma.report.deleteMany();
+  await prisma.recommendation.deleteMany();
   await prisma.goal.deleteMany();
+  await prisma.session.deleteMany();
+  await prisma.account.deleteMany();
   await prisma.user.deleteMany();
 
   // 2. Create primary demo user
@@ -20,7 +23,7 @@ async function main() {
       persona: 'Young Professional',
       monthlyIncome: 5000,
       monthlyExpensesBudget: 3200,
-      plan: PlanType.pro,
+      plan: 'pro',
       image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
     },
   });
@@ -28,34 +31,34 @@ async function main() {
   console.log(`👤 Created User: ${demoUser.email} (ID: ${demoUser.id})`);
 
   // 3. Seed financial goals
-  const goal1 = await prisma.goal.create({
+  await prisma.goal.create({
     data: {
       title: 'Emergency Savings Fund',
-      category: GoalCategory.savings,
+      category: 'savings',
       targetAmount: 5000,
       currentAmount: 3200,
       targetDate: new Date('2026-12-31'),
-      priority: Priority.high,
+      priority: 'high',
       isCompleted: false,
       notes: 'Aiming for 3 months of basic living expenses.',
       userId: demoUser.id,
     },
   });
 
-  const goal2 = await prisma.goal.create({
+  await prisma.goal.create({
     data: {
       title: 'Pay Off High-Interest Credit Card',
-      category: GoalCategory.debt,
+      category: 'debt',
       targetAmount: 2000,
       currentAmount: 1400,
       targetDate: new Date('2026-10-15'),
-      priority: Priority.high,
+      priority: 'high',
       isCompleted: false,
       userId: demoUser.id,
     },
   });
 
-  console.log(`🎯 Seeded ${2} financial goals.`);
+  console.log(`🎯 Seeded 2 financial goals.`);
 
   // 4. Seed monthly financial report
   await prisma.report.create({
@@ -71,16 +74,18 @@ async function main() {
 
   console.log(`📊 Seeded initial report data.`);
 
-  // 5. Seed user subscription details
+  // 5. Seed user subscription details (Updated for Paystack)
   await prisma.subscription.create({
     data: {
-      plan: PlanType.pro,
+      plan: 'pro',
       status: 'ACTIVE',
-      payfastToken: 'pf_sub_token_mock_123',
+      paystackCustomerCode: 'CUS_mock_123456',
+      paystackSubscriptionCode: 'SUB_mock_789012',
       userId: demoUser.id,
     },
   });
 
+  console.log(`💳 Seeded user subscription (Paystack).`);
   console.log('✅ Database seeding complete!');
 }
 

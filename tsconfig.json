@@ -31,12 +31,15 @@
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
+    "test",
+    "tests",
+    "e2e",
     "server.ts",
     "vite.config.ts",
     "playwright.config.ts",
@@ -44,6 +47,8 @@
     "src/test-utils.tsx",
     "**/*.test.ts",
     "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
     "src/utils/__tests__/**",
     "src/components/**/__tests__/**"
   ]

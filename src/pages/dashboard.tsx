@@ -1,13 +1,12 @@
 import React from 'react';
-import { GoalCategory } from '@prisma/client';
 
-// Local Mock Data with strict Prisma enum casting
+// Local Mock Data using standard string types matching schema.prisma
 const mockGoal = {
   id: '1',
   title: 'Emergency Fund',
   targetAmount: 10000,
   currentAmount: 2500,
-  category: 'savings' as GoalCategory,
+  category: 'savings',
   targetDate: '2026-12-31',
   priority: 'high',
   isCompleted: false,
@@ -26,7 +25,7 @@ const mockRecommendation = {
   title: 'Reduce Dining Out',
   description: 'You spent 15% more on food this month.',
   impact: 'High',
-  category: 'expenses' as any,
+  category: 'expenses',
   potentialSavings: 150,
   actionText: 'Set Budget',
   applied: false,

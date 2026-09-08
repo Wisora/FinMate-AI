@@ -1,6 +1,1 @@
-{
-  "/_app": "pages/_app.js",
-  "/_error": "pages/_error.js",
-  "/_document": "pages/_document.js",
-  "/api/auth/[...nextauth]": "pages/api/auth/[...nextauth].js"
-}
+{"/_app":"pages/_app.js","/admin-subscriptions":"pages/admin-subscriptions.html","/_error":"pages/_error.js","/api/budgets":"pages/api/budgets.js","/api/payfast-notify":"pages/api/payfast-notify.js","/api/subscriptions":"pages/api/subscriptions.js","/api/transactions":"pages/api/transactions.js","/dashboard":"pages/dashboard.html","/api/auth/[...nextauth]":"pages/api/auth/[...nextauth].js","/_document":"pages/_document.js","/404":"pages/404.html"}
